@@ -20,18 +20,25 @@ var Util = require('../util.js');
 
 /**
  * The pose sensor, implemented using DeviceMotion APIs.
+ *
+ * @param {number} kFilter
+ * @param {number} predictionTime
+ * @param {boolean} touchPannerDisabled
+ * @param {boolean} yawOnly
  */
-function FusionPoseSensor() {
+function FusionPoseSensor(kFilter, predictionTime, touchPannerDisabled, yawOnly) {
   this.deviceId = 'webvr-polyfill:fused';
   this.deviceName = 'VR Position Device (webvr-polyfill:fused)';
+  this.touchPannerDisabled = touchPannerDisabled;
+  this.yawOnly = yawOnly;
 
   this.accelerometer = new MathUtil.Vector3();
   this.gyroscope = new MathUtil.Vector3();
 
   this.start();
 
-  this.filter = new ComplementaryFilter(window.WebVRConfig.K_FILTER);
-  this.posePredictor = new PosePredictor(window.WebVRConfig.PREDICTION_TIME_S);
+  this.filter = new ComplementaryFilter(kFilter);
+  this.posePredictor = new PosePredictor(predictionTime);
   this.touchPanner = new TouchPanner();
 
   this.filterToWorldQ = new MathUtil.Quaternion();
@@ -81,14 +88,14 @@ FusionPoseSensor.prototype.getOrientation = function() {
   var out = new MathUtil.Quaternion();
   out.copy(this.filterToWorldQ);
   out.multiply(this.resetQ);
-  if (!window.WebVRConfig.TOUCH_PANNER_DISABLED) {
+  if (!this.touchPannerDisabled) {
     out.multiply(this.touchPanner.getOrientation());
   }
   out.multiply(this.predictedQ);
   out.multiply(this.worldToScreenQ);
 
   // Handle the yaw-only case.
-  if (window.WebVRConfig.YAW_ONLY) {
+  if (this.yawOnly) {
     // Make a quaternion that only turns around the Y-axis.
     out.x = 0;
     out.z = 0;
@@ -118,7 +125,7 @@ FusionPoseSensor.prototype.resetPose = function() {
   // Take into account original pose.
   this.resetQ.multiply(this.originalPoseAdjustQ);
 
-  if (!window.WebVRConfig.TOUCH_PANNER_DISABLED) {
+  if (!this.touchPannerDisabled) {
     this.touchPanner.resetSensor();
   }
 };

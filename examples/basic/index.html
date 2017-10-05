@@ -2,7 +2,7 @@
 
 <html lang="en">
 <head>
-<title>Web VR Polyfill - basic example</title>
+<title>Cardboard VRDisplay - basic example</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
 <meta name="mobile-web-app-capable" content="yes">
@@ -45,10 +45,6 @@ canvas {
 </body>
 
 <script>
-WebVRConfig = {
-  BUFFER_SCALE: 1.0,
-};
-
 document.addEventListener('touchmove', function(e) {
   e.preventDefault();
 });
@@ -63,11 +59,29 @@ document.addEventListener('touchmove', function(e) {
 <!-- VREffect.js handles stereo camera setup and rendering.  -->
 <script src="node_modules/three/examples/js/effects/VREffect.js"></script>
 
-<!-- A polyfill for the WebVR API.  -->
-<script src="../../build/webvr-polyfill.js"></script>
+<script src="../../dist/cardboard-vr-display.js"></script>
 
 
 <script>
+
+// Mock VRFrameData for VRControls
+function VRFrameData () {
+  this.leftViewMatrix = new Float32Array(16);
+  this.rightViewMatrix = new Float32Array(16);
+  this.leftProjectionMatrix = new Float32Array(16);
+  this.rightProjectionMatrix = new Float32Array(16);
+  this.pose = null;
+};
+
+var vrDisplay = new CardboardVRDisplay({ BUFFER_FRAME: 1.0 });
+
+navigator.getVRDisplays = function () {
+  return new Promise(function (resolve) {
+    resolve([vrDisplay]);
+  });
+};
+
+
 // Setup three.js WebGL renderer. Note: Antialiasing is a big performance hit.
 // Only enable it if you actually need to.
 var renderer = new THREE.WebGLRenderer({antialias: false});
@@ -89,22 +103,13 @@ var controls = new THREE.VRControls(camera);
 var effect = new THREE.VREffect(renderer);
 effect.setSize(window.innerWidth, window.innerHeight);
 
-
 // Add a repeating grid as a skybox.
 var boxWidth = 5;
 var loader = new THREE.TextureLoader();
 loader.load('img/box.png', onTextureLoaded);
 
-// Get the VRDisplay and save it for later.
-var vrDisplay = null;
-navigator.getVRDisplays().then(function(displays) {
-  if (displays.length > 0) {
-    vrDisplay = displays[0];
-
-    // Kick off the render loop.
-    vrDisplay.requestAnimationFrame(animate);
-  }
-});
+// Kick off the render loop.
+vrDisplay.requestAnimationFrame(animate);
 
 function onTextureLoaded(texture) {
   texture.wrapS = THREE.RepeatWrapping;

@@ -1,13 +1,13 @@
 {
-  "name": "webvr-polyfill",
-  "version": "0.9.39",
-  "homepage": "https://github.com/googlevr/webvr-polyfill",
+  "name": "cardboard-vr-display",
+  "version": "1.0.0",
+  "homepage": "https://github.com/googlevr/cardboard-vr-display",
   "authors": [
     "Boris Smus <boris@smus.com>",
     "Brandon Jones <tojiro@gmail.com>",
     "Jordan Santell <jordan@jsantell.com>"
   ],
-  "description": "Use WebVR today, on mobile or desktop, without requiring a special browser build.",
+  "description": "A Cardboard VR implementation of a WebVR 1.1 VRDisplay for polyfilling the WebVR API",
   "devDependencies": {
     "chai": "^3.5.0",
     "jsdom": "^9.12.0",
@@ -16,7 +16,7 @@
     "webpack": "^2.6.1",
     "webpack-dev-server": "2.7.1"
   },
-  "main": "src/node-entry",
+  "main": "src/cardboard-vr-display",
   "keywords": [
     "vr",
     "webvr"
@@ -28,8 +28,8 @@
     "build": "webpack",
     "test": "mocha"
   },
-  "repository": "googlevr/webvr-polyfill",
+  "repository": "googlevr/cardboard-vr-display",
   "bugs": {
-    "url": "https://github.com/googlevr/webvr-polyfill/issues"
+    "url": "https://github.com/googlevr/cardboard-vr-display/issues"
   }
 }

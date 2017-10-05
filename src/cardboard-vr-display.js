@@ -22,6 +22,7 @@ var RotateInstructions = require('./rotate-instructions.js');
 var ViewerSelector = require('./viewer-selector.js');
 var VRDisplay = require('./base.js').VRDisplay;
 var Util = require('./util.js');
+var Options = require('./options');
 
 var Eye = {
   LEFT: 'left',
@@ -31,15 +32,21 @@ var Eye = {
 /**
  * VRDisplay based on mobile device parameters and DeviceMotion APIs.
  */
-function CardboardVRDisplay() {
-  this.displayName = 'Cardboard VRDisplay (webvr-polyfill)';
+function CardboardVRDisplay(config) {
+  var defaults = Util.extend({}, Options);
+  this.config = Util.extend(defaults, config || {});
+
+  this.displayName = 'Cardboard VRDisplay';
 
   this.capabilities.hasOrientation = true;
   this.capabilities.canPresent = true;
 
   // "Private" members.
-  this.bufferScale_ = window.WebVRConfig.BUFFER_SCALE;
-  this.poseSensor_ = new FusionPoseSensor();
+  this.bufferScale_ = this.config.BUFFER_SCALE;
+  this.poseSensor_ = new FusionPoseSensor(this.config.K_FILTER,
+                                          this.config.PREDICTION_TIME_S,
+                                          this.config.TOUCH_PANNER_DISABLED,
+                                          this.config.YAW_ONLY);
   this.distorter_ = null;
   this.cardboardUI_ = null;
 
@@ -52,7 +59,7 @@ function CardboardVRDisplay() {
   // Set the correct initial viewer.
   this.deviceInfo_.setViewer(this.viewerSelector_.getCurrentViewer());
 
-  if (!window.WebVRConfig.ROTATE_INSTRUCTIONS_DISABLED) {
+  if (!this.config.ROTATE_INSTRUCTIONS_DISABLED) {
     this.rotateInstructions_ = new RotateInstructions();
   }
 
@@ -131,14 +138,17 @@ CardboardVRDisplay.prototype.beginPresent_ = function() {
 
   // Provides a way to opt out of distortion
   if (this.layer_.predistorted) {
-    if (!window.WebVRConfig.CARDBOARD_UI_DISABLED) {
+    if (!this.config.CARDBOARD_UI_DISABLED) {
       gl.canvas.width = Util.getScreenWidth() * this.bufferScale_;
       gl.canvas.height = Util.getScreenHeight() * this.bufferScale_;
       this.cardboardUI_ = new CardboardUI(gl);
     }
   } else {
     // Create a new distorter for the target context
-    this.distorter_ = new CardboardDistorter(gl);
+    this.cardboardUI_ = new CardboardUI(gl);
+    this.distorter_ = new CardboardDistorter(gl, this.cardboardUI_,
+                                                 this.config.BUFFER_SCALE,
+                                                 this.config.DIRTY_SUBMIT_FRAME_BINDINGS);
     this.distorter_.updateDeviceInfo(this.deviceInfo_);
     this.cardboardUI_ = this.distorter_.cardboardUI;
   }

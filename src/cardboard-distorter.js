@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-var CardboardUI = require('./cardboard-ui.js');
 var Util = require('./util.js');
 var WGLUPreserveGLState = require('./deps/wglu-preserve-state.js');
 
@@ -45,15 +44,22 @@ var distortionFS = [
 
 /**
  * A mesh-based distorter.
+ *
+ * @param {WebGLRenderingContext} gl
+ * @param {CardboardUI} cardboardUI;
+ * @param {number} bufferScale;
+ * @param {boolean} dirtySubmitFrameBindings;
  */
-function CardboardDistorter(gl) {
+function CardboardDistorter(gl, cardboardUI, bufferScale, dirtySubmitFrameBindings) {
   this.gl = gl;
+  this.cardboardUI = cardboardUI;
+  this.bufferScale = bufferScale;
+  this.dirtySubmitFrameBindings = dirtySubmitFrameBindings;
   this.ctxAttribs = gl.getContextAttributes();
 
   this.meshWidth = 20;
   this.meshHeight = 20;
 
-  this.bufferScale = window.WebVRConfig.BUFFER_SCALE;
 
   this.bufferWidth = gl.drawingBufferWidth;
   this.bufferHeight = gl.drawingBufferHeight;
@@ -116,10 +122,6 @@ function CardboardDistorter(gl) {
   this.patch();
 
   this.onResize();
-
-  if (!window.WebVRConfig.CARDBOARD_UI_DISABLED) {
-    this.cardboardUI = new CardboardUI(gl);
-  }
 };
 
 /**
@@ -407,7 +409,7 @@ CardboardDistorter.prototype.submitFrame = function() {
 
   var glState = [];
 
-  if (!window.WebVRConfig.DIRTY_SUBMIT_FRAME_BINDINGS) {
+  if (!this.dirtySubmitFrameBindings) {
     glState.push(
       gl.CURRENT_PROGRAM,
       gl.ARRAY_BUFFER_BINDING,
@@ -469,7 +471,7 @@ CardboardDistorter.prototype.submitFrame = function() {
       gl.clear(gl.COLOR_BUFFER_BIT);
     }
 
-    if (!window.WebVRConfig.DIRTY_SUBMIT_FRAME_BINDINGS) {
+    if (!self.dirtySubmitFrameBindings) {
       self.realBindFramebuffer.call(gl, gl.FRAMEBUFFER, self.lastBoundFramebuffer);
     }
 

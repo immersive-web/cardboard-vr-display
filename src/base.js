@@ -41,7 +41,7 @@ function VRFrameData() {
 function VRDisplay() {
   this.isPolyfilled = true;
   this.displayId = nextDisplayId++;
-  this.displayName = 'webvr-polyfill displayName';
+  this.displayName = '';
 
   this.depthNear = 0.01;
   this.depthFar = 10000.0;
@@ -426,36 +426,5 @@ VRDisplay.prototype.getEyeParameters = function(whichEye) {
   return null;
 };
 
-/*
- * Deprecated classes
- */
-
-/**
- * The base class for all VR devices. (Deprecated)
- */
-function VRDevice() {
-  this.isPolyfilled = true;
-  this.hardwareUnitId = 'webvr-polyfill hardwareUnitId';
-  this.deviceId = 'webvr-polyfill deviceId';
-  this.deviceName = 'webvr-polyfill deviceName';
-}
-
-/**
- * The base class for all VR HMD devices. (Deprecated)
- */
-function HMDVRDevice() {
-}
-HMDVRDevice.prototype = new VRDevice();
-
-/**
- * The base class for all VR position sensor devices. (Deprecated)
- */
-function PositionSensorVRDevice() {
-}
-PositionSensorVRDevice.prototype = new VRDevice();
-
 module.exports.VRFrameData = VRFrameData;
 module.exports.VRDisplay = VRDisplay;
-module.exports.VRDevice = VRDevice;
-module.exports.HMDVRDevice = HMDVRDevice;
-module.exports.PositionSensorVRDevice = PositionSensorVRDevice;

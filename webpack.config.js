@@ -8,11 +8,13 @@ const license = fs.readFileSync(licensePath, 'utf8');
 
 module.exports = {
   entry: {
-    'webvr-polyfill': './src/main.js',
-    'webvr-polyfill.min': './src/main.js',
+    'cardboard-vr-display': './src/cardboard-vr-display.js',
+    'cardboard-vr-display.min': './src/cardboard-vr-display.js',
   },
   output: {
-    path: path.join(__dirname, 'build'),
+    library: 'CardboardVRDisplay',
+    libraryTarget: 'var',
+    path: path.join(__dirname, 'dist'),
     filename: '[name].js',
     sourceMapFilename: '[name].js.map',
   },
@@ -21,9 +23,9 @@ module.exports = {
   },
   devtool: 'source-map',
   devServer: {
-    publicPath: '/build',
+    publicPath: '/dist',
     contentBase: [
-      path.resolve(__dirname, 'build'),
+      path.resolve(__dirname, 'dist'),
       path.resolve(__dirname, 'examples'),
     ],
     host: '0.0.0.0',
@@ -35,4 +37,5 @@ module.exports = {
     }),
     new webpack.BannerPlugin({ banner: license, raw: true }),
   ],
+
 };
