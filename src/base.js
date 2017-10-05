@@ -60,6 +60,10 @@ function VRDisplay() {
   // "Private" members.
   this.waitingForPresent_ = false;
   this.layer_ = null;
+  // In WebVR 2.0, the context's canvas doesn't have
+  // to be in the DOM at all; if we have to inject it,
+  // set orphanedLayer to true so we can remove it later
+  this.orphanedLayer = null;
 
   this.fullscreenElement_ = null;
   this.fullscreenWrapper_ = null;
@@ -163,6 +167,7 @@ VRDisplay.prototype.removeFullscreenWrapper = function() {
   } else {
     element.removeAttribute('style');
   }
+
   this.fullscreenElement_ = null;
   this.fullscreenElementCachedStyle_ = null;
 
@@ -170,6 +175,11 @@ VRDisplay.prototype.removeFullscreenWrapper = function() {
   this.fullscreenWrapper_.removeChild(element);
   parent.insertBefore(element, this.fullscreenWrapper_);
   parent.removeChild(this.fullscreenWrapper_);
+
+  if (this.orphanedLayer) {
+    element.parentElement.removeChild(element);
+  }
+
 
   return element;
 };
@@ -235,6 +245,13 @@ VRDisplay.prototype.requestPresent = function(layers) {
 
     self.waitingForPresent_ = false;
     if (self.layer_ && self.layer_.source) {
+
+      // We may have to inject the canvas in the DOM
+      if (!self.layer_.source.parentElement) {
+        self.orphanedLayer = true;
+        document.body.appendChild(self.layer_.source);
+      }
+
       var fullscreenElement = self.wrapForFullscreen(self.layer_.source);
 
       var onFullscreenChange = function() {
