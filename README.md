@@ -1,25 +1,17 @@
-# WebVR Polyfill
+# cardboard-vr-display
 
-[![Build Status](http://img.shields.io/travis/googlevr/webvr-polyfill.svg?style=flat-square)](https://travis-ci.org/googlevr/webvr-polyfill)
-[![Build Status](http://img.shields.io/npm/v/webvr-polyfill.svg?style=flat-square)](https://www.npmjs.org/package/webvr-polyfill)
+[![Build Status](http://img.shields.io/travis/googlevr/cardboard-vr-display.svg?style=flat-square)](https://travis-ci.org/googlevr/cardboard-vr-display)
+[![Build Status](http://img.shields.io/npm/v/cardboard-vr-display.svg?style=flat-square)](https://www.npmjs.org/package/cardboard-vr-display)
 
+A JavaScript implementation of a [WebVR 1.1 VRDisplay][VRDisplay]. This is the magic
+behind rendering distorted stereoscopic views for browsers that do not support the [WebVR API]
+with the [webvr-polyfill].
 
-A JavaScript implementation of the [WebVR spec][spec]. This project lets you use
-WebVR today, without requiring a [special][moz] [browser][cr] build. It also
-lets you view the same content without requiring a virtual reality viewer.
+Unless you're building a WebVR wrapper, you probably want to use [webvr-polyfill] directly
+rather than this. This component **does not** polyfill interfaces like `VRFrameData` and
+`navigator.getVRDisplays`, and up to the consumer, although trivial (see examples).
 
-Take a look at [basic WebVR samples][samples] that use this polyfill.
-
-[moz]: http://mozvr.com/
-[cr]: https://drive.google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ
-[samples]: https://toji.github.io/webvr-samples/
-[spec]: https://mozvr.github.io/webvr-spec/
-
-## Implementation
-
-The polyfill decides which VRDisplays to provide, depending on the configuration
-of your browser. Mobile devices provide the `CardboardVRDisplay`. Desktop devices
-use the `MouseKeyboardVRDisplay`.
+## How It Works
 
 `CardboardVRDisplay` uses DeviceMotionEvents to implement a complementary
 filter which does [sensor fusion and pose prediction][fusion] to provide
@@ -32,57 +24,49 @@ to make the VR experience more intuitive, including:
 - An interstitial which only appears in portrait orientation, requesting you switch
   into landscape orientation (if [orientation lock][ol] is not available).
 
-`MouseKeyboardVRDisplay` uses mouse events to allow you to do the equivalent of
-mouselook. It also uses keyboard arrows keys to look around the scene
-with the keyboard.
-
 [fusion]: http://smus.com/sensor-fusion-prediction-webvr/
 [ol]: https://www.w3.org/TR/screen-orientation/
 
+## Installation
 
-## Configuration
+```
+$ npm install --save cardboard-vr-display
+```
 
-The polyfill can be configured and debugged with various options. The following
-are supported:
+## Usage
 
-```javascript
-WebVRConfig = {
-  // Flag to disabled the UI in VR Mode.
-  CARDBOARD_UI_DISABLED: false, // Default: false
+`cardboard-vr-display` exposes a constructor for a `CardboardVRDisplay` that takes
+a single options configuration, detailed below. Check out [running the demo](#running-the-demo)
+to try the different options.
 
-  // Forces availability of VR mode, even for non-mobile devices.
-  FORCE_ENABLE_VR: true, // Default: false.
+```js
+import CardboardVRDisplay from 'cardboard-vr-display';
 
+// Default options
+const options = {
   // Complementary filter coefficient. 0 for accelerometer, 1 for gyro.
-  K_FILTER: 0.98, // Default: 0.98.
-
-  // Flag to disable the instructions to rotate your device.
-  ROTATE_INSTRUCTIONS_DISABLED: false, // Default: false.
+  K_FILTER: 0.98,
 
   // How far into the future to predict during fast motion (in seconds).
-  PREDICTION_TIME_S: 0.040, // Default: 0.040.
+  PREDICTION_TIME_S: 0.040,
 
-  // Flag to disable touch panner. In case you have your own touch controls.
-  TOUCH_PANNER_DISABLED: false, // Default: true.
+  // Flag to enable touch panner. In case you have your own touch controls.
+  TOUCH_PANNER_DISABLED: true,
+
+  // Flag to disabled the UI in VR Mode.
+  CARDBOARD_UI_DISABLED: false, 
+  // Flag to disable the instructions to rotate your device.
+  ROTATE_INSTRUCTIONS_DISABLED: false,
 
   // Enable yaw panning only, disabling roll and pitch. This can be useful
   // for panoramas with nothing interesting above or below.
-  YAW_ONLY: true, // Default: false.
-
-  // To disable keyboard and mouse controls, if you want to use your own
-  // implementation.
-  MOUSE_KEYBOARD_CONTROLS_DISABLED: true, // Default: false.
-
-  // Prevent the polyfill from initializing immediately. Requires the app
-  // to call InitializeWebVRPolyfill() before it can be used.
-  DEFER_INITIALIZATION: true, // Default: false.
-
-  // Enable the deprecated version of the API (navigator.getVRDevices).
-  ENABLE_DEPRECATED_API: true, // Default: false.
+  YAW_ONLY: false,
 
   // Scales the recommended buffer size reported by WebVR, which can improve
   // performance.
-  BUFFER_SCALE: 0.5, // Default: 0.5.
+  // UPDATE(2016-05-03): Setting this to 0.5 by default since 1.0 does not
+  // perform well on many mobile devices.
+  BUFFER_SCALE: 0.5,
 
   // Allow VRDisplay.submitFrame to change gl bindings, which is more
   // efficient if the application code will re-bind its resources on the
@@ -91,71 +75,32 @@ WebVRConfig = {
   // Dirty bindings include: gl.FRAMEBUFFER_BINDING, gl.CURRENT_PROGRAM,
   // gl.ARRAY_BUFFER_BINDING, gl.ELEMENT_ARRAY_BUFFER_BINDING,
   // and gl.TEXTURE_BINDING_2D for texture unit 0.
-  DIRTY_SUBMIT_FRAME_BINDINGS: true, // Default: false.
+  DIRTY_SUBMIT_FRAME_BINDINGS: false,
+};
 
-  // When set to true, this will cause a polyfilled VRDisplay to always be
-  // appended to the list returned by navigator.getVRDisplays(), even if that
-  // list includes a native VRDisplay.
-  ALWAYS_APPEND_POLYFILL_DISPLAY: false,
-
-  // There are versions of Chrome (M58-M60?) where the native WebVR API exists,
-  // and instead of returning 0 VR displays when none are detected,
-  // `navigator.getVRDisplays()`'s promise never resolves. This results
-  // in the polyfill hanging and not being able to provide fallback
-  // displays, so set a timeout in milliseconds to stop waiting for a response
-  // and just use polyfilled displays.
-  // https://bugs.chromium.org/p/chromium/issues/detail?id=727969
-  GET_VR_DISPLAYS_TIMEOUT: 1000,
-}
+const display = new CardboardVRDisplay(options);
 ```
-
-## Performance
-
-Performance is critical for VR. If you find your application is too sluggish,
-consider tweaking some of the above parameters. In particular, keeping
-`BUFFER_SCALE` at 0.5 (the default) will likely help a lot.
-
-## WebVR 1.1 Shim
-
-The polyfill exposes a helper method `WebVRPolyfill.InstallWebVRSpecShim` which
-installs a shim that updates a WebVR 1.0 spec implementation to WebVR 1.1.
 
 ## Development
-
-If you'd like to contribute to the `webvr-poyfill` library, check out
-the repository and install
-[Node](https://nodejs.org/en/download/package-manager/) and the dependencies:
-
-```bash
-git clone https://github.com/googlevr/webvr-polyfill
-cd webvr-polyfill
-npm install
-```
-
-### Development Commands
 
 * `npm install`: installs the dependencies.
 * `npm start`: auto-builds the module whenever any source changes and serves the example
 content on `http://0.0.0.0:8080/`.
 * `npm run build`: builds the module.
 
+## Running The Demo
+
+View [examples/index.html] to see a demo running the CardboardVRDisplay. This executes
+a minimal WebVR 1.1 polyfill and parses query params to inject configuration parameters.
+View some premade links at [index.html]. For example, to set the buffer scale to 1.0
+and limit rotation to yaw, go to [examples/index.html?YAW_ONLY=true&BUFFER_SCALE=1.0].
+View all config options at [src/options.js].
+
 ## License
 
 This program is free software for both commercial and non-commercial use,
 distributed under the [Apache 2.0 License](LICENSE).
 
-
-## Thanks
-
-- [Brandon Jones][bj] and [Vladimir Vukicevic][vv] for their work on the [WebVR
-  spec][spec].
-- [Ricardo Cabello][doob] for THREE.js.
-- [Diego Marcos][dm] for VREffect and VRControls.
-- [Dmitriy Kovalev][dk] for help with lens distortion correction.
-
-[dk]: https://github.com/dmitriykovalev/
-[bj]: https://twitter.com/tojiro
-[vv]: https://twitter.com/vvuk
-[spec]: https://mozvr.github.io/webvr-spec/
-[dm]: https://twitter.com/dmarcos
-[doob]: https://twitter.com/mrdoob
+[VRDisplay]: https://w3c.github.io/webvr/spec/1.1/#interface-vrdisplay
+[WebVR API]: https://w3c.github.io/webvr/spec/latest 
+[webvr-polyfill]: https://github.com/googlevr/webvr-polyfill

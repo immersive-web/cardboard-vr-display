@@ -1,8 +1,63 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="refresh" content="0; url=examples/">
-  </head>
-  <body></body>
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<title>Cardboard VRDisplay</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
+<style>
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+  background-color: #fcfcfc;
+  color: #111;
+  margin: 0px;
+  padding: 0;
+  overflow: hidden;
+}
+
+h1 {
+  font-weight: 300;
+  text-align: center;
+}
+
+#wrapper {
+  width: 60vw;
+  margin: 10px auto;
+}
+
+a {
+  color: #000;
+  font-weight: 400;
+}
+
+</style>
+</head>
+
+<body>
+  <div id="wrapper">
+      <h1>cardboard-vr-display</h1>
+      <p>
+        <a href='https://github.com/googlevr/cardboard-vr-display'>cardboard-vr-display</a>
+
+        is a JavaScript implementation of a <a href='https://w3c.github.io/webvr/spec/1.1/#interface-vrdisplay'>WebVR 1.1 VRDisplay</a>. This is the magic behind rendering distorted stereoscopic views for browsers that do not support the WebVR API with the <a href='https://github.com/googlevr/webvr-polyfill'>webvr-polyfill</a>.
+      </p>
+      <h2>Demos</h2>
+      <p>The example parses the query params in the URL to pass configuration into a CardboardVRDisplay. Some examples links below.
+      </p>
+      <ul>
+          <li><a href='examples/index.html'>Defaults</a></li>
+          <li><a href='examples/index.html?BUFFER_SCALE=1'>BUFFER_SCALE=1</a></li>
+          <li><a href='examples/index.html?CARDBOARD_UI_DISABLED=true'>CARDBOARD_UI_DISABLED=true</a></li>
+          <li><a href='examples/index.html?ROTATE_INSTRUCTIONS_DISABLED=true&YAW_ONLY=true'>ROTATE_INSTRUCTIONS_DISABLED=true&YAW_ONLY=true</a></li>
+          <li><a href='examples/index.html?DIRTY_SUBMIT_FRAME_BINDINGS=true'>DIRTY_SUBMIT_FRAME_BINDINGS=true</a></li>
+      </ul>
+  </div>
+</body>
 </html>

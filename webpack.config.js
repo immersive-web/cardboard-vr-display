@@ -23,10 +23,7 @@ module.exports = {
   devtool: 'source-map',
   devServer: {
     publicPath: '/dist',
-    contentBase: [
-      path.resolve(__dirname, 'dist'),
-      path.resolve(__dirname, 'examples'),
-    ],
+    contentBase: [path.resolve(__dirname)],
     host: '0.0.0.0',
     disableHostCheck: true
   },
