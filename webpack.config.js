@@ -9,7 +9,6 @@ const license = fs.readFileSync(licensePath, 'utf8');
 module.exports = {
   entry: {
     'cardboard-vr-display': './src/cardboard-vr-display.js',
-    'cardboard-vr-display.min': './src/cardboard-vr-display.js',
   },
   output: {
     library: 'CardboardVRDisplay',
@@ -32,10 +31,6 @@ module.exports = {
     disableHostCheck: true
   },
   plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      include: /\.min\.js$/,
-    }),
     new webpack.BannerPlugin({ banner: license, raw: true }),
   ],
-
 };
