@@ -41,6 +41,7 @@ function CardboardVRDisplay(config) {
   this.capabilities.hasOrientation = true;
   this.capabilities.canPresent = true;
 
+  console.log(config, this.config);
   // "Private" members.
   this.bufferScale_ = this.config.BUFFER_SCALE;
   this.poseSensor_ = new FusionPoseSensor(this.config.K_FILTER,
@@ -145,12 +146,13 @@ CardboardVRDisplay.prototype.beginPresent_ = function() {
     }
   } else {
     // Create a new distorter for the target context
-    this.cardboardUI_ = new CardboardUI(gl);
+    if (!this.config.CARDBOARD_UI_DISABLED) {
+      this.cardboardUI_ = new CardboardUI(gl);
+    }
     this.distorter_ = new CardboardDistorter(gl, this.cardboardUI_,
                                                  this.config.BUFFER_SCALE,
                                                  this.config.DIRTY_SUBMIT_FRAME_BINDINGS);
     this.distorter_.updateDeviceInfo(this.deviceInfo_);
-    this.cardboardUI_ = this.distorter_.cardboardUI;
   }
 
   if (this.cardboardUI_) {

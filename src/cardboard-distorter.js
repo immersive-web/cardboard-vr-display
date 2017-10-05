@@ -46,7 +46,7 @@ var distortionFS = [
  * A mesh-based distorter.
  *
  * @param {WebGLRenderingContext} gl
- * @param {CardboardUI} cardboardUI;
+ * @param {CardboardUI?} cardboardUI;
  * @param {number} bufferScale;
  * @param {boolean} dirtySubmitFrameBindings;
  */
