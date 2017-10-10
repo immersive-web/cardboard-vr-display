@@ -14,7 +14,7 @@
  */
 
 var Util = require('./util.js');
-var WGLUPreserveGLState = require('./deps/wglu-preserve-state.js');
+var WGLUPreserveGLState = require('gl-preserve-state');
 
 var distortionVS = [
   'attribute vec2 position;',
