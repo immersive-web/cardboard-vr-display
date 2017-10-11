@@ -29,6 +29,7 @@
     "url": "https://github.com/googlevr/cardboard-vr-display/issues"
   },
   "dependencies": {
-    "gl-preserve-state": "^1.0.0"
+    "gl-preserve-state": "^1.0.0",
+    "webvr-polyfill-dpdb": "^1.0.3"
   }
 }
