@@ -80,14 +80,28 @@ const options = {
 };
 
 const display = new CardboardVRDisplay(options);
+
+function MockVRFrameData () {
+  this.leftViewMatrix = new Float32Array(16);
+  this.rightViewMatrix = new Float32Array(16);
+  this.leftProjectionMatrix = new Float32Array(16);
+  this.rightProjectionMatrix = new Float32Array(16);
+  this.pose = null;
+};
+
+const frame = new (window.VRFrameData || MockVRFrameData)();
+
+display.isConnected; // true
+display.getFrameData(frame);
+
+frame.rightViewMatrix; // Float32Array
+frame.pose; // { orientation, position }
 ```
 
 ## Development
 
 * `npm install`: installs the dependencies.
-* `npm start`: auto-builds the module whenever any source changes and serves the example
-content on `http://0.0.0.0:8080/`.
-* `npm run build`: builds the module.
+* `npm run build`: builds the distributable.
 
 ## Running The Demo
 
@@ -103,5 +117,6 @@ This program is free software for both commercial and non-commercial use,
 distributed under the [Apache 2.0 License](LICENSE).
 
 [VRDisplay]: https://w3c.github.io/webvr/spec/1.1/#interface-vrdisplay
+[WebVR API 1.1]: https://w3c.github.io/webvr/spec/1.1
 [WebVR API]: https://w3c.github.io/webvr/spec/latest
 [webvr-polyfill]: https://github.com/googlevr/webvr-polyfill

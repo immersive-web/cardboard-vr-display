@@ -14,3 +14,5 @@ examples
 logs
 node_modules
 pids
+dist
+third_party
