@@ -17,7 +17,7 @@
 
 /**
  * @license
- * wglu-preserve-state.js
+ * gl-preserve-state
  * Copyright (c) 2016, Brandon Jones.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy

@@ -54,7 +54,8 @@ const options = {
   TOUCH_PANNER_DISABLED: true,
 
   // Flag to disabled the UI in VR Mode.
-  CARDBOARD_UI_DISABLED: false, 
+  CARDBOARD_UI_DISABLED: false,
+
   // Flag to disable the instructions to rotate your device.
   ROTATE_INSTRUCTIONS_DISABLED: false,
 
@@ -102,5 +103,5 @@ This program is free software for both commercial and non-commercial use,
 distributed under the [Apache 2.0 License](LICENSE).
 
 [VRDisplay]: https://w3c.github.io/webvr/spec/1.1/#interface-vrdisplay
-[WebVR API]: https://w3c.github.io/webvr/spec/latest 
+[WebVR API]: https://w3c.github.io/webvr/spec/latest
 [webvr-polyfill]: https://github.com/googlevr/webvr-polyfill
