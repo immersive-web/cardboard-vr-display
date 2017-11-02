@@ -105,11 +105,11 @@ frame.pose; // { orientation, position }
 
 ## Running The Demo
 
-View [examples/index.html] to see a demo running the CardboardVRDisplay. This executes
+View the [example] to see a demo running the CardboardVRDisplay. This executes
 a minimal WebVR 1.1 polyfill and parses query params to inject configuration parameters.
 View some premade links at [index.html]. For example, to set the buffer scale to 1.0
-and limit rotation to yaw, go to [examples/index.html?YAW_ONLY=true&BUFFER_SCALE=1.0].
-View all config options at [src/options.js].
+and limit rotation to yaw, go to [https://googlevr.github.io/cardboard-vr-display/examples/index.html?YAW_ONLY=true&BUFFER_SCALE=1.0].
+View all config options at `src/options.js`.
 
 ## License
 
@@ -120,3 +120,5 @@ distributed under the [Apache 2.0 License](LICENSE).
 [WebVR API 1.1]: https://w3c.github.io/webvr/spec/1.1
 [WebVR API]: https://w3c.github.io/webvr/spec/latest
 [webvr-polyfill]: https://github.com/googlevr/webvr-polyfill
+[example]: https://googlevr.github.io/cardboard-vr-display/examples
+[index.html]: https://googlevr.github.io/cardboard-vr-display
