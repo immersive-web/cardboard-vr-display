@@ -41,7 +41,6 @@ function CardboardVRDisplay(config) {
   this.capabilities.hasOrientation = true;
   this.capabilities.canPresent = true;
 
-  console.log(config, this.config);
   // "Private" members.
   this.bufferScale_ = this.config.BUFFER_SCALE;
   this.poseSensor_ = new FusionPoseSensor(this.config.K_FILTER,
@@ -51,7 +50,7 @@ function CardboardVRDisplay(config) {
   this.distorter_ = null;
   this.cardboardUI_ = null;
 
-  this.dpdb_ = new Dpdb(true, this.onDeviceParamsUpdated_.bind(this));
+  this.dpdb_ = new Dpdb(this.config.DPDB_URL, this.onDeviceParamsUpdated_.bind(this));
   this.deviceInfo_ = new DeviceInfo(this.dpdb_.getDeviceParams());
 
   this.viewerSelector_ = new ViewerSelector();

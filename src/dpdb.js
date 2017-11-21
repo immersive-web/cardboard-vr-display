@@ -18,20 +18,16 @@
 var DPDB_CACHE = require('webvr-polyfill-dpdb');
 var Util = require('./util.js');
 
-// Online DPDB URL.
-var ONLINE_DPDB_URL =
-  'https://dpdb.webvr.rocks/dpdb.json';
-
 /**
  * Calculates device parameters based on the DPDB (Device Parameter Database).
  * Initially, uses the cached DPDB values.
  *
- * If fetchOnline == true, then this object tries to fetch the online version
+ * If url defined, then this object tries to fetch the online version
  * of the DPDB and updates the device info if a better match is found.
  * Calls the onDeviceParamsUpdated callback when there is an update to the
  * device information.
  */
-function Dpdb(fetchOnline, onDeviceParamsUpdated) {
+function Dpdb(url, onDeviceParamsUpdated) {
   // Start with the offline DPDB cache while we are loading the real one.
   this.dpdb = DPDB_CACHE;
 
@@ -39,13 +35,13 @@ function Dpdb(fetchOnline, onDeviceParamsUpdated) {
   this.recalculateDeviceParams_();
 
   // XHR to fetch online DPDB file, if requested.
-  if (fetchOnline) {
+  if (url) {
     // Set the callback.
     this.onDeviceParamsUpdated = onDeviceParamsUpdated;
 
     var xhr = new XMLHttpRequest();
     var obj = this;
-    xhr.open('GET', ONLINE_DPDB_URL, true);
+    xhr.open('GET', url, true);
     xhr.addEventListener('load', function() {
       obj.loading = false;
       if (xhr.status >= 200 && xhr.status <= 299) {

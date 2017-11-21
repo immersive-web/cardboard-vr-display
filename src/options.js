@@ -14,6 +14,12 @@
  */
 
 module.exports = {
+  // The URL to JSON of DPDB information. By default, uses the data
+  // from https://github.com/WebVRRocks/webvr-polyfill-dpdb; if left
+  // falsy, then no attempt is made.
+  // Added in 1.0.1
+  DPDB_URL: 'https://dpdb.webvr.rocks/dpdb.json',
+
   // Complementary filter coefficient. 0 for accelerometer, 1 for gyro.
   K_FILTER: 0.98,
 
