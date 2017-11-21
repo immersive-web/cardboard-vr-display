@@ -1704,16 +1704,14 @@ var dpdb$3 = Object.freeze({
 
 var DPDB_CACHE = ( dpdb$3 && dpdb$2 ) || dpdb$3;
 
-var ONLINE_DPDB_URL =
-  'https://dpdb.webvr.rocks/dpdb.json';
-function Dpdb(fetchOnline, onDeviceParamsUpdated) {
+function Dpdb(url, onDeviceParamsUpdated) {
   this.dpdb = DPDB_CACHE;
   this.recalculateDeviceParams_();
-  if (fetchOnline) {
+  if (url) {
     this.onDeviceParamsUpdated = onDeviceParamsUpdated;
     var xhr = new XMLHttpRequest();
     var obj = this;
-    xhr.open('GET', ONLINE_DPDB_URL, true);
+    xhr.open('GET', url, true);
     xhr.addEventListener('load', function() {
       obj.loading = false;
       if (xhr.status >= 200 && xhr.status <= 299) {
@@ -2761,6 +2759,7 @@ var base = {
 };
 
 var options = {
+  DPDB_URL: 'https://dpdb.webvr.rocks/dpdb.json',
   K_FILTER: 0.98,
   PREDICTION_TIME_S: 0.040,
   TOUCH_PANNER_DISABLED: true,
@@ -2782,7 +2781,6 @@ function CardboardVRDisplay(config) {
   this.displayName = 'Cardboard VRDisplay';
   this.capabilities.hasOrientation = true;
   this.capabilities.canPresent = true;
-  console.log(config, this.config);
   this.bufferScale_ = this.config.BUFFER_SCALE;
   this.poseSensor_ = new fusionPoseSensor(this.config.K_FILTER,
                                           this.config.PREDICTION_TIME_S,
@@ -2790,7 +2788,7 @@ function CardboardVRDisplay(config) {
                                           this.config.YAW_ONLY);
   this.distorter_ = null;
   this.cardboardUI_ = null;
-  this.dpdb_ = new dpdb(true, this.onDeviceParamsUpdated_.bind(this));
+  this.dpdb_ = new dpdb(this.config.DPDB_URL, this.onDeviceParamsUpdated_.bind(this));
   this.deviceInfo_ = new deviceInfo(this.dpdb_.getDeviceParams());
   this.viewerSelector_ = new viewerSelector();
   this.viewerSelector_.onChange(this.onViewerChanged_.bind(this));
