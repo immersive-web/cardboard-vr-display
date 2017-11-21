@@ -22,7 +22,10 @@
   ],
   "license": "Apache-2.0",
   "scripts": {
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "preversion": "npm test",
+    "version": "npm run build && git add dist/*",
+    "postversion": "git push && git push --tags && npm publish"
   },
   "repository": "googlevr/cardboard-vr-display",
   "bugs": {
