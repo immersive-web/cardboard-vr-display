@@ -260,15 +260,6 @@ Util.safariCssSizeWorkaround = function(canvas) {
   window.Util = Util;
   window.canvas = canvas;
 };
-Util.isDebug = function() {
-  return Util.getQueryParameter('debug');
-};
-Util.getQueryParameter = function(name) {
-  var name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-  var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-      results = regex.exec(location.search);
-  return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-};
 Util.frameDataFromPose = (function() {
   var piOver180 = Math.PI / 180.0;
   var rad45 = Math.PI * 0.25;
@@ -434,6 +425,14 @@ Util.getDomainFromUrl = function(url) {
   }
   domain = domain.split(':')[0];
   return domain;
+};
+Util.getQuaternionAngle = function(quat) {
+  if (quat.w > 1) {
+    console.warn('getQuaternionAngle: w > 1');
+    return 0;
+  }
+  var angle = 2 * Math.acos(quat.w);
+  return angle;
 };
 var util = Util;
 
@@ -1819,8 +1818,9 @@ SensorSample.prototype.copy = function(sensorSample) {
 };
 var sensorSample = SensorSample;
 
-function ComplementaryFilter(kFilter) {
+function ComplementaryFilter(kFilter, isDebug) {
   this.kFilter = kFilter;
+  this.isDebug = isDebug;
   this.currentAccelMeasurement = new sensorSample();
   this.currentGyroMeasurement = new sensorSample();
   this.previousGyroMeasurement = new sensorSample();
@@ -1872,7 +1872,7 @@ ComplementaryFilter.prototype.run_ = function() {
   var deltaQ = new mathUtil.Quaternion();
   deltaQ.setFromUnitVectors(this.estimatedGravity, this.measuredGravity);
   deltaQ.inverse();
-  if (util.isDebug()) {
+  if (this.isDebug) {
     console.log('Delta: %d deg, G_est: (%s, %s, %s), G_meas: (%s, %s, %s)',
                 mathUtil.radToDeg * util.getQuaternionAngle(deltaQ),
                 (this.estimatedGravity.x).toFixed(1),
@@ -1910,8 +1910,9 @@ ComplementaryFilter.prototype.gyroToQuaternionDelta_ = function(gyro, dt) {
 };
 var complementaryFilter = ComplementaryFilter;
 
-function PosePredictor(predictionTimeS) {
+function PosePredictor(predictionTimeS, isDebug) {
   this.predictionTimeS = predictionTimeS;
+  this.isDebug = isDebug;
   this.previousQ = new mathUtil.Quaternion();
   this.previousTimestampS = null;
   this.deltaQ = new mathUtil.Quaternion();
@@ -1928,7 +1929,7 @@ PosePredictor.prototype.getPrediction = function(currentQ, gyro, timestampS) {
   axis.normalize();
   var angularSpeed = gyro.length();
   if (angularSpeed < mathUtil.degToRad * 20) {
-    if (util.isDebug()) {
+    if (this.isDebug) {
       console.log('Moving slowly, at %s deg/s: no prediction',
                   (mathUtil.radToDeg * angularSpeed).toFixed(1));
     }
@@ -1990,7 +1991,7 @@ TouchPanner.prototype.onTouchEnd_ = function(e) {
 };
 var touchPanner = TouchPanner;
 
-function FusionPoseSensor(kFilter, predictionTime, touchPannerDisabled, yawOnly) {
+function FusionPoseSensor(kFilter, predictionTime, touchPannerDisabled, yawOnly, isDebug) {
   this.deviceId = 'webvr-polyfill:fused';
   this.deviceName = 'VR Position Device (webvr-polyfill:fused)';
   this.touchPannerDisabled = touchPannerDisabled;
@@ -1998,8 +1999,8 @@ function FusionPoseSensor(kFilter, predictionTime, touchPannerDisabled, yawOnly)
   this.accelerometer = new mathUtil.Vector3();
   this.gyroscope = new mathUtil.Vector3();
   this.start();
-  this.filter = new complementaryFilter(kFilter);
-  this.posePredictor = new posePredictor(predictionTime);
+  this.filter = new complementaryFilter(kFilter, isDebug);
+  this.posePredictor = new posePredictor(predictionTime, isDebug);
   this.touchPanner = new touchPanner();
   this.filterToWorldQ = new mathUtil.Quaternion();
   if (util.isIOS()) {
@@ -2759,6 +2760,7 @@ var base = {
 };
 
 var options = {
+  DEBUG: false,
   DPDB_URL: 'https://dpdb.webvr.rocks/dpdb.json',
   K_FILTER: 0.98,
   PREDICTION_TIME_S: 0.040,
@@ -2785,7 +2787,8 @@ function CardboardVRDisplay(config) {
   this.poseSensor_ = new fusionPoseSensor(this.config.K_FILTER,
                                           this.config.PREDICTION_TIME_S,
                                           this.config.TOUCH_PANNER_DISABLED,
-                                          this.config.YAW_ONLY);
+                                          this.config.YAW_ONLY,
+                                          this.config.DEBUG);
   this.distorter_ = null;
   this.cardboardUI_ = null;
   this.dpdb_ = new dpdb(this.config.DPDB_URL, this.onDeviceParamsUpdated_.bind(this));
@@ -2834,7 +2837,7 @@ CardboardVRDisplay.prototype.getEyeParameters = function(whichEye) {
   };
 };
 CardboardVRDisplay.prototype.onDeviceParamsUpdated_ = function(newParams) {
-  if (util.isDebug()) {
+  if (this.config.DEBUG) {
     console.log('DPDB reported that device params were updated.');
   }
   this.deviceInfo_.updateDeviceParams(newParams);
