@@ -25,8 +25,9 @@ var Util = require('../util.js');
  * @param {number} predictionTime
  * @param {boolean} touchPannerDisabled
  * @param {boolean} yawOnly
+ * @param {boolean} isDebug
  */
-function FusionPoseSensor(kFilter, predictionTime, touchPannerDisabled, yawOnly) {
+function FusionPoseSensor(kFilter, predictionTime, touchPannerDisabled, yawOnly, isDebug) {
   this.deviceId = 'webvr-polyfill:fused';
   this.deviceName = 'VR Position Device (webvr-polyfill:fused)';
   this.touchPannerDisabled = touchPannerDisabled;
@@ -37,8 +38,8 @@ function FusionPoseSensor(kFilter, predictionTime, touchPannerDisabled, yawOnly)
 
   this.start();
 
-  this.filter = new ComplementaryFilter(kFilter);
-  this.posePredictor = new PosePredictor(predictionTime);
+  this.filter = new ComplementaryFilter(kFilter, isDebug);
+  this.posePredictor = new PosePredictor(predictionTime, isDebug);
   this.touchPanner = new TouchPanner();
 
   this.filterToWorldQ = new MathUtil.Quaternion();

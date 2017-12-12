@@ -264,17 +264,6 @@ Util.safariCssSizeWorkaround = function(canvas) {
   window.canvas = canvas;
 };
 
-Util.isDebug = function() {
-  return Util.getQueryParameter('debug');
-};
-
-Util.getQueryParameter = function(name) {
-  var name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-  var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-      results = regex.exec(location.search);
-  return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-};
-
 Util.frameDataFromPose = (function() {
   var piOver180 = Math.PI / 180.0;
   var rad45 = Math.PI * 0.25;
@@ -477,5 +466,16 @@ Util.getDomainFromUrl = function(url) {
 
   return domain;
 }
+
+Util.getQuaternionAngle = function(quat) {
+  // angle = 2 * acos(qw)
+  // If w is greater than 1 (THREE.js, how can this be?), arccos is not defined.
+  if (quat.w > 1) {
+    console.warn('getQuaternionAngle: w > 1');
+    return 0;
+  }
+  var angle = 2 * Math.acos(quat.w);
+  return angle;
+};
 
 module.exports = Util;

@@ -44,6 +44,10 @@ import CardboardVRDisplay from 'cardboard-vr-display';
 
 // Default options
 const options = {
+  // Whether or not CardboardVRDisplay is in debug mode. Logs extra
+  // messages. Added in 1.0.2.
+  DEBUG: false,
+
   // The URL to JSON of DPDB information. By default, uses the data
   // from https://github.com/WebVRRocks/webvr-polyfill-dpdb; if left
   // falsy, then no attempt is made.

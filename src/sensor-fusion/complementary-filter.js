@@ -31,8 +31,9 @@ var Util = require('../util.js');
  * 3. Combine the two estimates, weighing (1) in the long term, but (2) for the
  *    short term.
  */
-function ComplementaryFilter(kFilter) {
+function ComplementaryFilter(kFilter, isDebug) {
   this.kFilter = kFilter;
+  this.isDebug = isDebug;
 
   // Raw sensor measurements.
   this.currentAccelMeasurement = new SensorSample();
@@ -115,7 +116,7 @@ ComplementaryFilter.prototype.run_ = function() {
   deltaQ.setFromUnitVectors(this.estimatedGravity, this.measuredGravity);
   deltaQ.inverse();
 
-  if (Util.isDebug()) {
+  if (this.isDebug) {
     console.log('Delta: %d deg, G_est: (%s, %s, %s), G_meas: (%s, %s, %s)',
                 MathUtil.radToDeg * Util.getQuaternionAngle(deltaQ),
                 (this.estimatedGravity.x).toFixed(1),

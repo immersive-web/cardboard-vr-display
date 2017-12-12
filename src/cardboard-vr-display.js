@@ -46,7 +46,8 @@ function CardboardVRDisplay(config) {
   this.poseSensor_ = new FusionPoseSensor(this.config.K_FILTER,
                                           this.config.PREDICTION_TIME_S,
                                           this.config.TOUCH_PANNER_DISABLED,
-                                          this.config.YAW_ONLY);
+                                          this.config.YAW_ONLY,
+                                          this.config.DEBUG);
   this.distorter_ = null;
   this.cardboardUI_ = null;
 
@@ -110,7 +111,7 @@ CardboardVRDisplay.prototype.getEyeParameters = function(whichEye) {
 };
 
 CardboardVRDisplay.prototype.onDeviceParamsUpdated_ = function(newParams) {
-  if (Util.isDebug()) {
+  if (this.config.DEBUG) {
     console.log('DPDB reported that device params were updated.');
   }
   this.deviceInfo_.updateDeviceParams(newParams);

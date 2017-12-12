@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 var MathUtil = require('../math-util');
-var Util = require('../util');
 
 /**
  * Given an orientation and the gyroscope data, predicts the future orientation
@@ -24,8 +23,9 @@ var Util = require('../util');
  * @param {Number} predictionTimeS time from head movement to the appearance of
  * the corresponding image.
  */
-function PosePredictor(predictionTimeS) {
+function PosePredictor(predictionTimeS, isDebug) {
   this.predictionTimeS = predictionTimeS;
+  this.isDebug = isDebug;
 
   // The quaternion corresponding to the previous state.
   this.previousQ = new MathUtil.Quaternion();
@@ -54,7 +54,7 @@ PosePredictor.prototype.getPrediction = function(currentQ, gyro, timestampS) {
 
   // If we're rotating slowly, don't do prediction.
   if (angularSpeed < MathUtil.degToRad * 20) {
-    if (Util.isDebug()) {
+    if (this.isDebug) {
       console.log('Moving slowly, at %s deg/s: no prediction',
                   (MathUtil.radToDeg * angularSpeed).toFixed(1));
     }
