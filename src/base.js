@@ -14,7 +14,7 @@
  */
 
 var Util = require('./util.js');
-var WakeLock = require('./wakelock.js');
+var NoSleep = require('nosleep.js');
 
 // Start at a higher number to reduce chance of conflict.
 var nextDisplayId = 1000;
@@ -38,7 +38,10 @@ function VRFrameData() {
 /**
  * The base class for all VR displays.
  */
-function VRDisplay() {
+function VRDisplay(config) {
+  config = config || {};
+  var USE_WAKELOCK = 'wakelock' in config ? config.wakelock : true;
+
   this.isPolyfilled = true;
   this.displayId = nextDisplayId++;
   this.displayName = '';
@@ -73,7 +76,11 @@ function VRDisplay() {
   this.fullscreenChangeHandler_ = null;
   this.fullscreenErrorHandler_ = null;
 
-  this.wakelock_ = new WakeLock();
+  // Get an appropriate wakelock for Android or iOS if MOBILE_WAKE_LOCK
+  // is true.
+  if (USE_WAKELOCK && Util.isMobile()) {
+    this.wakelock_ = new NoSleep();
+  }
 }
 
 VRDisplay.prototype.getFrameData = function(frameData) {
@@ -272,7 +279,7 @@ VRDisplay.prototype.requestPresent = function(layers) {
             screen.orientation.unlock();
           }
           self.removeFullscreenWrapper();
-          self.wakelock_.release();
+          self.disableWakeLock();
           self.endPresent_();
           self.removeFullscreenListeners_();
         }
@@ -286,7 +293,7 @@ VRDisplay.prototype.requestPresent = function(layers) {
         self.removeFullscreenWrapper();
         self.removeFullscreenListeners_();
 
-        self.wakelock_.release();
+        self.disableWakeLock();
         self.waitingForPresent_ = false;
         self.isPresenting = false;
 
@@ -297,11 +304,11 @@ VRDisplay.prototype.requestPresent = function(layers) {
           onFullscreenChange, onFullscreenError);
 
       if (Util.requestFullscreen(fullscreenElement)) {
-        self.wakelock_.request();
+        self.enableWakeLock();
         self.waitingForPresent_ = true;
       } else if (Util.isIOS() || Util.isWebViewAndroid()) {
         // *sigh* Just fake it.
-        self.wakelock_.request();
+        self.enableWakeLock();
         self.isPresenting = true;
         self.beginPresent_();
         self.fireVRDisplayPresentChange_();
@@ -321,7 +328,7 @@ VRDisplay.prototype.exitPresent = function() {
   var self = this;
   this.isPresenting = false;
   this.layer_ = null;
-  this.wakelock_.release();
+  this.disableWakeLock();
 
   return new Promise(function(resolve, reject) {
     if (wasPresenting) {
@@ -425,6 +432,18 @@ VRDisplay.prototype.removeFullscreenListeners_ = function() {
   this.fullscreenChangeHandler_ = null;
   this.fullscreenErrorHandler_ = null;
 };
+
+VRDisplay.prototype.enableWakeLock = function() {
+  if (this.wakelock_) {
+    this.wakelock_.enable();
+  }
+}
+
+VRDisplay.prototype.disableWakeLock = function() {
+  if (this.wakelock_) {
+    this.wakelock_.disable();
+  }
+}
 
 VRDisplay.prototype.beginPresent_ = function() {
   // Override to add custom behavior when presentation begins.

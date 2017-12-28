@@ -34,7 +34,13 @@ var Eye = {
  */
 function CardboardVRDisplay(config) {
   var defaults = Util.extend({}, Options);
-  this.config = Util.extend(defaults, config || {});
+  config = Util.extend(defaults, config || {});
+
+  VRDisplay.call(this, {
+    wakelock: config.MOBILE_WAKE_LOCK,
+  });
+
+  this.config = config;
 
   this.displayName = 'Cardboard VRDisplay';
 
@@ -69,7 +75,7 @@ function CardboardVRDisplay(config) {
     window.addEventListener('resize', this.onResize_.bind(this));
   }
 }
-CardboardVRDisplay.prototype = new VRDisplay();
+CardboardVRDisplay.prototype = Object.create(VRDisplay.prototype);
 
 CardboardVRDisplay.prototype.getImmediatePose = function() {
   return {
