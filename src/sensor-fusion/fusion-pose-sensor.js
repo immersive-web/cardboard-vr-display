@@ -218,10 +218,10 @@ FusionPoseSensor.prototype.start = function() {
   this.onMessageCallback_ = this.onMessage_.bind(this);
 
   // Only listen for postMessages if we're in an iOS and embedded inside a cross
-  // domain IFrame. In this case, the polyfill can still work if the containing
+  // origin IFrame. In this case, the polyfill can still work if the containing
   // page sends synthetic devicemotion events. For an example of this, see
-  // iframe-message-sender.js in VR View: https://goo.gl/XDtvFZ
-  if (Util.isIOS() && Util.isInsideCrossDomainIFrame()) {
+  // the iframe example in the repo at `examples/iframe.html`
+  if (Util.isIOS() && Util.isInsideCrossOriginIFrame()) {
     window.addEventListener('message', this.onMessageCallback_);
   }
   window.addEventListener('orientationchange', this.onOrientationChangeCallback_);
