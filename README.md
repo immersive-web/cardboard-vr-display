@@ -42,6 +42,18 @@ It is possible to have a magic window using a VRDisplay that isn't 100% width/he
 $ npm install --save cardboard-vr-display
 ```
 
+## Browser Support
+
+Should support most modern browsers (IE11 is missing a few, for example) and requires [ES5](https://kangax.github.io/compat-table/es5/) JavaScript support. If you want to support a non-ES5 browser, or browser lacking some DOM globals, you must use a transformation or provide polyfills to support older environments.
+
+Globals required:
+
+* [`Promise`](https://caniuse.com/#feat=promises)
+* [`CustomEvent`](https://caniuse.com/#feat=customevent)
+* [`requestAnimationFrame`](https://caniuse.com/#feat=requestanimationframe)
+
+Additionally, WebGL support, [`devicemotion`](https://caniuse.com/#feat=deviceorientation) events, and common browser globals (`window`, `navigator`, `document`) are also required in the environment.
+
 ## Usage
 
 `cardboard-vr-display` exposes a constructor for a `CardboardVRDisplay` that takes
