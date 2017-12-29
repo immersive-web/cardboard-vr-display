@@ -442,30 +442,30 @@ Util.frameDataFromPose = (function() {
   };
 })();
 
-Util.isInsideCrossDomainIFrame = function() {
+// via https://github.com/googlevr/webvr-polyfill/issues/271
+Util.isInsideCrossOriginIFrame = function() {
   var isFramed = (window.self !== window.top);
-  var refDomain = Util.getDomainFromUrl(document.referrer);
-  var thisDomain = Util.getDomainFromUrl(window.location.href);
+  var refOrigin = Util.getOriginFromUrl(document.referrer);
+  var thisOrigin = Util.getOriginFromUrl(window.location.href);
 
-  return isFramed && (refDomain !== thisDomain);
+  return isFramed && (refOrigin !== thisOrigin);
 };
 
-// From http://stackoverflow.com/a/23945027.
-Util.getDomainFromUrl = function(url) {
-  var domain;
-  // Find & remove protocol (http, ftp, etc.) and get domain.
-  if (url.indexOf("://") > -1) {
-    domain = url.split('/')[2];
+// via https://github.com/googlevr/webvr-polyfill/issues/271
+Util.getOriginFromUrl = function(url) {
+  var domainIdx;
+  var protoSepIdx = url.indexOf("://");
+  if (protoSepIdx !== -1) {
+    domainIdx = protoSepIdx + 3;
+  } else {
+    domainIdx = 0;
   }
-  else {
-    domain = url.split('/')[0];
+  var domainEndIdx = url.indexOf('/', domainIdx);
+  if (domainEndIdx === -1) {
+    domainEndIdx = url.length;
   }
-
-  //find & remove port number
-  domain = domain.split(':')[0];
-
-  return domain;
-}
+  return url.substring(0, domainEndIdx)
+};
 
 Util.getQuaternionAngle = function(quat) {
   // angle = 2 * acos(qw)
