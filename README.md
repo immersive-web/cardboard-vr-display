@@ -27,6 +27,11 @@ to make the VR experience more intuitive, including:
 [fusion]: http://smus.com/sensor-fusion-prediction-webvr/
 [ol]: https://www.w3.org/TR/screen-orientation/
 
+### I-Frames
+
+On iOS, cross-origin iframes do not have access to the `devicemotion` events. The CardboardVRDisplay however
+does respond to events passed in from a parent frame via `postMessage`. See the [iframe example][iframe-example] to see how the events must be formatted.
+
 ## Installation
 
 ```
@@ -131,4 +136,5 @@ distributed under the [Apache 2.0 License](LICENSE).
 [WebVR API]: https://w3c.github.io/webvr/spec/latest
 [webvr-polyfill]: https://github.com/googlevr/webvr-polyfill
 [example]: https://googlevr.github.io/cardboard-vr-display/examples
+[iframe-example]: examples/iframe.html
 [index.html]: https://googlevr.github.io/cardboard-vr-display
