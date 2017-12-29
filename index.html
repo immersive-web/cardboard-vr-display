@@ -35,7 +35,6 @@ html, body {
   color: #111;
   margin: 0px;
   padding: 0;
-  overflow: hidden;
 }
 
 h1 {
@@ -65,7 +64,7 @@ a {
         is a JavaScript implementation of a <a href='https://w3c.github.io/webvr/spec/1.1/#interface-vrdisplay'>WebVR 1.1 VRDisplay</a>. This is the magic behind rendering distorted stereoscopic views for browsers that do not support the WebVR API with the <a href='https://github.com/googlevr/webvr-polyfill'>webvr-polyfill</a>.
       </p>
       <h2>Demos</h2>
-      <p>The example parses the query params in the URL to pass configuration into a CardboardVRDisplay. Some examples links below.
+      <p>The base example parses the query params in the URL to pass configuration into a CardboardVRDisplay. Some examples links below.
       </p>
       <ul>
           <li><a href='examples/index.html'>Defaults</a></li>
@@ -73,6 +72,11 @@ a {
           <li><a href='examples/index.html?CARDBOARD_UI_DISABLED=true'>CARDBOARD_UI_DISABLED=true</a></li>
           <li><a href='examples/index.html?ROTATE_INSTRUCTIONS_DISABLED=true&YAW_ONLY=true'>ROTATE_INSTRUCTIONS_DISABLED=true&YAW_ONLY=true</a></li>
           <li><a href='examples/index.html?DIRTY_SUBMIT_FRAME_BINDINGS=true'>DIRTY_SUBMIT_FRAME_BINDINGS=true</a></li>
+      </ul>
+      <p>There are other examples for testing other use cases. They also respond to the query params passed into the URL.</p>
+      <ul>
+          <li><a href='examples/iframe.html'>Embedding WebVR content in an iframe</a></li>
+          <li><a href='examples/magicwindow.html'>Magic window WebVR</a></li>
       </ul>
   </div>
 </body>

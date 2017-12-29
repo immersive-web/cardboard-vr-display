@@ -32,6 +32,10 @@ to make the VR experience more intuitive, including:
 On iOS, cross-origin iframes do not have access to the `devicemotion` events. The CardboardVRDisplay however
 does respond to events passed in from a parent frame via `postMessage`. See the [iframe example][iframe-example] to see how the events must be formatted.
 
+### Magic Window
+
+It is possible to have a magic window using a VRDisplay that isn't 100% width/height of the window, and can jump into fullscreen WebVR. See the [magic window][magicwindow-example] for usage.
+
 ## Installation
 
 ```
@@ -137,4 +141,5 @@ distributed under the [Apache 2.0 License](LICENSE).
 [webvr-polyfill]: https://github.com/googlevr/webvr-polyfill
 [example]: https://googlevr.github.io/cardboard-vr-display/examples
 [iframe-example]: examples/iframe.html
+[magicwindow-example]: examples/magicwindow.html
 [index.html]: https://googlevr.github.io/cardboard-vr-display
