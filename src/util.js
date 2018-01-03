@@ -412,15 +412,15 @@ Util.frameDataFromPose = (function() {
   var defaultOrientation = new Float32Array([0, 0, 0, 1]);
   var defaultPosition = new Float32Array([0, 0, 0]);
 
-  function updateEyeMatrices(projection, view, pose, parameters, vrDisplay) {
-    mat4_perspectiveFromFieldOfView(projection, parameters ? parameters.fieldOfView : null, vrDisplay.depthNear, vrDisplay.depthFar);
+  function updateEyeMatrices(projection, view, pose, fov, offset, vrDisplay) {
+    mat4_perspectiveFromFieldOfView(projection, fov || null, vrDisplay.depthNear, vrDisplay.depthFar);
 
     var orientation = pose.orientation || defaultOrientation;
     var position = pose.position || defaultPosition;
 
     mat4_fromRotationTranslation(view, orientation, position);
-    if (parameters)
-      mat4_translate(view, view, parameters.offset);
+    if (offset)
+      mat4_translate(view, view, offset);
     mat4_invert(view, view);
   }
 
@@ -433,10 +433,10 @@ Util.frameDataFromPose = (function() {
 
     updateEyeMatrices(
         frameData.leftProjectionMatrix, frameData.leftViewMatrix,
-        pose, vrDisplay.getEyeParameters("left"), vrDisplay);
+        pose, vrDisplay._getFieldOfView("left"), vrDisplay._getEyeOffset("left"), vrDisplay);
     updateEyeMatrices(
         frameData.rightProjectionMatrix, frameData.rightViewMatrix,
-        pose, vrDisplay.getEyeParameters("right"), vrDisplay);
+        pose, vrDisplay._getFieldOfView("right"), vrDisplay._getEyeOffset("right"), vrDisplay);
 
     return true;
   };
@@ -476,6 +476,29 @@ Util.getQuaternionAngle = function(quat) {
   }
   var angle = 2 * Math.acos(quat.w);
   return angle;
+};
+
+/**
+ * Takes a key and a message and when executed,
+ * prints a console.warn with the message if this is the first
+ * of `key`'s warnings.
+ */
+Util.warnOnce = (function() {
+  var observedWarnings = {};
+
+  return function(key, message) {
+    if (observedWarnings[key] === undefined) {
+      console.warn('webvr-polyfill: ' + message);
+      observedWarnings[key] = true;
+    }
+  };
+})();
+
+Util.deprecateWarning = function (deprecated, suggested) {
+  var alternative = suggested ? ('Please use ' + suggested + ' instead.') : '';
+  Util.warnOnce(deprecated, deprecated + ' has been deprecated. ' +
+                            'This may not work on native WebVR displays. ' +
+                            alternative);
 };
 
 module.exports = Util;

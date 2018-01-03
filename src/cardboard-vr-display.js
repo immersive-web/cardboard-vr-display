@@ -21,6 +21,7 @@ var FusionPoseSensor = require('./sensor-fusion/fusion-pose-sensor.js');
 var RotateInstructions = require('./rotate-instructions.js');
 var ViewerSelector = require('./viewer-selector.js');
 var VRDisplay = require('./base.js').VRDisplay;
+var VRDisplayCapabilities = require('./base.js').VRDisplayCapabilities;
 var Util = require('./util.js');
 var Options = require('./options');
 
@@ -44,8 +45,15 @@ function CardboardVRDisplay(config) {
 
   this.displayName = 'Cardboard VRDisplay';
 
-  this.capabilities.hasOrientation = true;
-  this.capabilities.canPresent = true;
+  this.capabilities = new VRDisplayCapabilities({
+    hasPosition: false,
+    hasOrientation: true,
+    hasExternalDisplay: false,
+    canPresent: true,
+    maxLayers: 1
+  });
+
+  this.stageParameters = null;
 
   // "Private" members.
   this.bufferScale_ = this.config.BUFFER_SCALE;
@@ -77,7 +85,7 @@ function CardboardVRDisplay(config) {
 }
 CardboardVRDisplay.prototype = Object.create(VRDisplay.prototype);
 
-CardboardVRDisplay.prototype.getImmediatePose = function() {
+CardboardVRDisplay.prototype._getPose = function() {
   return {
     position: this.poseSensor_.getPosition(),
     orientation: this.poseSensor_.getOrientation(),
@@ -86,19 +94,16 @@ CardboardVRDisplay.prototype.getImmediatePose = function() {
     angularVelocity: null,
     angularAcceleration: null
   };
-};
+}
 
-CardboardVRDisplay.prototype.resetPose = function() {
+CardboardVRDisplay.prototype._resetPose = function() {
   this.poseSensor_.resetPose();
 };
 
-CardboardVRDisplay.prototype.getEyeParameters = function(whichEye) {
-  var offset = [this.deviceInfo_.viewer.interLensDistance * 0.5, 0.0, 0.0];
-  var fieldOfView;
-
+CardboardVRDisplay.prototype._getFieldOfView = function(whichEye) {
   // TODO: FoV can be a little expensive to compute. Cache when device params change.
+  var fieldOfView;
   if (whichEye == Eye.LEFT) {
-    offset[0] *= -1.0;
     fieldOfView = this.deviceInfo_.getFieldOfViewLeftEye();
   } else if (whichEye == Eye.RIGHT) {
     fieldOfView = this.deviceInfo_.getFieldOfViewRightEye();
@@ -107,13 +112,45 @@ CardboardVRDisplay.prototype.getEyeParameters = function(whichEye) {
     return null;
   }
 
-  return {
-    fieldOfView: fieldOfView,
+  return fieldOfView;
+};
+
+CardboardVRDisplay.prototype._getEyeOffset = function(whichEye) {
+  var offset;
+
+  if (whichEye == Eye.LEFT) {
+    offset = [this.deviceInfo_.viewer.interLensDistance * 0.5, 0.0, 0.0];
+  } else if (whichEye == Eye.RIGHT) {
+    offset = [-this.deviceInfo_.viewer.interLensDistance * 0.5, 0.0, 0.0];
+  } else {
+    console.error('Invalid eye provided: %s', whichEye);
+    return null;
+  }
+
+  return offset;
+};
+
+CardboardVRDisplay.prototype.getEyeParameters = function(whichEye) {
+  var offset = this._getEyeOffset(whichEye);
+  var fieldOfView = this._getFieldOfView(whichEye);
+
+  var eyeParams = {
     offset: offset,
     // TODO: Should be able to provide better values than these.
     renderWidth: this.deviceInfo_.device.width * 0.5 * this.bufferScale_,
     renderHeight: this.deviceInfo_.device.height * this.bufferScale_,
   };
+
+  Object.defineProperty(eyeParams, 'fieldOfView', {
+    enumerable: true,
+    get: function() {
+      Util.deprecateWarning('VRFieldOfView',
+                            'VRFrameData\'s projection matrices');
+      return fieldOfView;
+    },
+  });
+
+  return eyeParams;
 };
 
 CardboardVRDisplay.prototype.onDeviceParamsUpdated_ = function(newParams) {

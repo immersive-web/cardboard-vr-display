@@ -18,7 +18,6 @@ var NoSleep = require('nosleep.js');
 
 // Start at a higher number to reduce chance of conflict.
 var nextDisplayId = 1000;
-var hasShowDeprecationWarning = false;
 
 var defaultLeftBounds = [0, 0, 0.5, 1];
 var defaultRightBounds = [0.5, 0, 0.5, 1];
@@ -34,6 +33,32 @@ function VRFrameData() {
   this.rightViewMatrix = new Float32Array(16);
   this.pose = null;
 };
+module.exports.VRFrameData = VRFrameData;
+
+function VRDisplayCapabilities (config) {
+  Object.defineProperties(this, {
+    hasPosition: {
+      writable: false, enumerable: true, value: config.hasPosition,
+    },
+    hasExternalDisplay: {
+      writable: false, enumerable: true, value: config.hasExternalDisplay,
+    },
+    canPresent: {
+      writable: false, enumerable: true, value: config.canPresent,
+    },
+    maxLayers: {
+      writable: false, enumerable: true, value: config.maxLayers,
+    },
+    hasOrientation: {
+      enumerable: true, get: function() {
+        Util.deprecateWarning('VRDisplayCapabilities.prototype.hasOrientation',
+                              'VRDisplay.prototype.getFrameData');
+        return config.hasOrientation;
+      },
+    },
+  });
+}
+module.exports.VRDisplayCapabilities = VRDisplayCapabilities;
 
 /**
  * The base class for all VR displays.
@@ -49,15 +74,24 @@ function VRDisplay(config) {
   this.depthNear = 0.01;
   this.depthFar = 10000.0;
 
-  this.isConnected = true;
   this.isPresenting = false;
-  this.capabilities = {
+
+  Object.defineProperty(this, 'isConnected', {
+    get: function() {
+      Util.deprecateWarning('VRDisplay.prototype.isConnected',
+                            'VRDisplayCapabilities.prototype.hasExternalDisplay');
+      return false;
+    },
+  });
+
+  this.capabilities = new VRDisplayCapabilities({
     hasPosition: false,
     hasOrientation: false,
     hasExternalDisplay: false,
     canPresent: false,
     maxLayers: 1
-  };
+  });
+
   this.stageParameters = null;
 
   // "Private" members.
@@ -86,13 +120,28 @@ function VRDisplay(config) {
 VRDisplay.prototype.getFrameData = function(frameData) {
   // TODO: Technically this should retain it's value for the duration of a frame
   // but I doubt that's practical to do in javascript.
-  return Util.frameDataFromPose(frameData, this.getPose(), this);
+  return Util.frameDataFromPose(frameData, this._getPose(), this);
 };
 
 VRDisplay.prototype.getPose = function() {
   // TODO: Technically this should retain it's value for the duration of a frame
   // but I doubt that's practical to do in javascript.
-  return this.getImmediatePose();
+  Util.deprecateWarning('VRDisplay.prototype.getPose',
+                        'VRDisplay.prototype.getFrameData');
+  return this._getPose();
+};
+
+VRDisplay.prototype.resetPose = function() {
+  Util.deprecateWarning('VRDisplay.prototype.resetPose');
+  return this._resetPose();
+};
+
+VRDisplay.prototype.getImmediatePose = function() {
+  // TODO: Technically this should retain it's value for the duration of a frame
+  // but I doubt that's practical to do in javascript.
+  Util.deprecateWarning('VRDisplay.prototype.getImmediatePose',
+                        'VRDisplay.prototype.getFrameData');
+  return this._getPose();
 };
 
 VRDisplay.prototype.requestAnimationFrame = function(callback) {
@@ -196,10 +245,8 @@ VRDisplay.prototype.requestPresent = function(layers) {
   var self = this;
 
   if (!(layers instanceof Array)) {
-    if (!hasShowDeprecationWarning) {
-      console.warn("Using a deprecated form of requestPresent. Should pass in an array of VRLayers.");
-      hasShowDeprecationWarning = true;
-    }
+    Util.deprecateWarning('VRDisplay.prototype.requestPresent with non-array argument',
+                          'an array of VRLayers as the first argument');
     layers = [layers];
   }
 
@@ -462,5 +509,4 @@ VRDisplay.prototype.getEyeParameters = function(whichEye) {
   return null;
 };
 
-module.exports.VRFrameData = VRFrameData;
 module.exports.VRDisplay = VRDisplay;
