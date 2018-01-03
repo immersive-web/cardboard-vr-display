@@ -141,9 +141,20 @@ FusionPoseSensor.prototype.updateDeviceMotion_ = function(deviceMotion) {
   var timestampS = deviceMotion.timeStamp / 1000;
 
   var deltaS = timestampS - this.previousTimestampS;
-  if (deltaS <= Util.MIN_TIMESTEP || deltaS > Util.MAX_TIMESTEP) {
-    console.warn('Invalid timestamps detected. Time step between successive ' +
-                 'gyroscope sensor samples is very small or not monotonic');
+
+  // On Firefox/iOS the `timeStamp` properties can come in out of order.
+  // so emit a warning about it and then stop. The rotation still ends up
+  // working.
+  // @TODO is there a better way to handle this with the `interval` property
+  // from the device motion event? `timeStamp` seems to be non-standard.
+  if (deltaS < 0) {
+    Util.warnOnce('fusion-pose-sensor:invalid:non-monotonic',
+                  'Invalid timestamps detected: non-monotonic timestamp from devicemotion');
+    this.previousTimestampS = timestampS;
+    return;
+  } else if (deltaS <= Util.MIN_TIMESTEP || deltaS > Util.MAX_TIMESTEP) {
+    Util.warnOnce('fusion-pose-sensor:invalid:outside-threshold',
+                  'Invalid timestamps detected: Timestamp from devicemotion outside expected range.');
     this.previousTimestampS = timestampS;
     return;
   }
