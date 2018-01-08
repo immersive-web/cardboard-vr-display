@@ -66,6 +66,7 @@ function FusionPoseSensor(kFilter, predictionTime, touchPannerDisabled, yawOnly,
   // Keep track of a reset transform for resetSensor.
   this.resetQ = new MathUtil.Quaternion();
 
+  this.isEdgeWindowsPhone = Util.isEdgeWindowsPhone();
   this.isFirefoxAndroid = Util.isFirefoxAndroid();
   this.isIOS = Util.isIOS();
 
@@ -166,9 +167,9 @@ FusionPoseSensor.prototype.updateDeviceMotion_ = function(deviceMotion) {
     this.gyroscope.set(rotRate.alpha, rotRate.beta, rotRate.gamma);
   }
 
-  // With iOS and Firefox Android, rotationRate is reported in degrees,
-  // so we first convert to radians.
-  if (this.isIOS || this.isFirefoxAndroid) {
+  // With iOS, Firefox Android, and Edge on Windows Phone, rotationRate
+  // is reported in degrees, so we first convert to radians.
+  if (this.isIOS || this.isFirefoxAndroid || this.isEdgeWindowsPhone) {
     this.gyroscope.multiplyScalar(Math.PI / 180);
   }
 

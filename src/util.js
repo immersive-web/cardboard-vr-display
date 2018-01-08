@@ -72,6 +72,14 @@ Util.isSafari = (function() {
   };
 })();
 
+Util.isEdgeWindowsPhone = (function() {
+  var isEdgeWindowsPhone = navigator.userAgent.indexOf('Windows Phone') !== -1 &&
+                           navigator.userAgent.indexOf('Edge') !== -1;
+  return function() {
+    return isEdgeWindowsPhone;
+  };
+})();
+
 Util.isFirefoxAndroid = (function() {
   var isFirefoxAndroid = navigator.userAgent.indexOf('Firefox') !== -1 &&
       navigator.userAgent.indexOf('Android') !== -1;
