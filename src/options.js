@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-module.exports = {
+const config = {
   // By default, on mobile, a wakelock is necessary to prevent the device's screen
   // from turning off without user input. Disable if you're keeping the screen awake through
   // other means on mobile. A wakelock is never used on desktop.
@@ -36,11 +36,9 @@ module.exports = {
   // How far into the future to predict during fast motion (in seconds).
   PREDICTION_TIME_S: 0.040,
 
-  // Flag to enable touch panner. In case you have your own touch controls.
-  TOUCH_PANNER_DISABLED: true,
-
   // Flag to disabled the UI in VR Mode.
-  CARDBOARD_UI_DISABLED: false, 
+  CARDBOARD_UI_DISABLED: false,
+
   // Flag to disable the instructions to rotate your device.
   ROTATE_INSTRUCTIONS_DISABLED: false,
 
@@ -63,3 +61,5 @@ module.exports = {
   // and gl.TEXTURE_BINDING_2D for texture unit 0.
   DIRTY_SUBMIT_FRAME_BINDINGS: false,
 };
+
+export default config;

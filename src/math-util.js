@@ -13,22 +13,20 @@
  * limitations under the License.
  */
 
-var MathUtil = window.MathUtil || {};
-
-MathUtil.degToRad = Math.PI / 180;
-MathUtil.radToDeg = 180 / Math.PI;
+export const degToRad = Math.PI / 180;
+export const radToDeg = 180 / Math.PI;
 
 // Some minimal math functionality borrowed from THREE.Math and stripped down
 // for the purposes of this library.
 
 
-MathUtil.Vector2 = function ( x, y ) {
+export const Vector2 = function ( x, y ) {
   this.x = x || 0;
   this.y = y || 0;
 };
 
-MathUtil.Vector2.prototype = {
-  constructor: MathUtil.Vector2,
+Vector2.prototype = {
+  constructor: Vector2,
 
   set: function ( x, y ) {
     this.x = x;
@@ -52,14 +50,14 @@ MathUtil.Vector2.prototype = {
   },
 };
 
-MathUtil.Vector3 = function ( x, y, z ) {
+export const Vector3 = function ( x, y, z ) {
   this.x = x || 0;
   this.y = y || 0;
   this.z = z || 0;
 };
 
-MathUtil.Vector3.prototype = {
-  constructor: MathUtil.Vector3,
+Vector3.prototype = {
+  constructor: Vector3,
 
   set: function ( x, y, z ) {
     this.x = x;
@@ -143,15 +141,15 @@ MathUtil.Vector3.prototype = {
   },
 };
 
-MathUtil.Quaternion = function ( x, y, z, w ) {
+export const Quaternion = function ( x, y, z, w ) {
   this.x = x || 0;
   this.y = y || 0;
   this.z = z || 0;
   this.w = ( w !== undefined ) ? w : 1;
 };
 
-MathUtil.Quaternion.prototype = {
-  constructor: MathUtil.Quaternion,
+Quaternion.prototype = {
+  constructor: Quaternion,
 
   set: function ( x, y, z, w ) {
     this.x = x;
@@ -326,7 +324,7 @@ MathUtil.Quaternion.prototype = {
     var EPS = 0.000001;
 
     return function ( vFrom, vTo ) {
-      if ( v1 === undefined ) v1 = new MathUtil.Vector3();
+      if ( v1 === undefined ) v1 = new Vector3();
 
       r = vFrom.dot( vTo ) + 1;
 
@@ -353,5 +351,3 @@ MathUtil.Quaternion.prototype = {
     }
   }(),
 };
-
-module.exports = MathUtil;

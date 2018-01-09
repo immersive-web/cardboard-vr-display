@@ -13,50 +13,29 @@
  * limitations under the License.
  */
 
-var Util = window.Util || {};
+export const MIN_TIMESTEP = 0.001;
+export const MAX_TIMESTEP = 1;
 
-Util.MIN_TIMESTEP = 0.001;
-Util.MAX_TIMESTEP = 1;
-
-Util.base64 = function(mimeType, base64) {
+export const base64 = function(mimeType, base64) {
   return 'data:' + mimeType + ';base64,' + base64;
 };
 
-Util.clamp = function(value, min, max) {
+export const clamp = function(value, min, max) {
   return Math.min(Math.max(min, value), max);
 };
 
-Util.lerp = function(a, b, t) {
+export const lerp = function(a, b, t) {
   return a + ((b - a) * t);
 };
 
-/**
- * Light polyfill for `Promise.race`. Returns
- * a promise that resolves when the first promise
- * provided resolves.
- *
- * @param {Array<Promise>} promises
- */
-Util.race = function(promises) {
-  if (Promise.race) {
-    return Promise.race(promises);
-  }
-
-  return new Promise(function (resolve, reject) {
-    for (var i = 0; i < promises.length; i++) {
-      promises[i].then(resolve, reject);
-    }
-  });
-};
-
-Util.isIOS = (function() {
+export const isIOS = (function() {
   var isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
   return function() {
     return isIOS;
   };
 })();
 
-Util.isWebViewAndroid = (function() {
+export const isWebViewAndroid = (function() {
   var isWebViewAndroid = navigator.userAgent.indexOf('Version') !== -1 &&
       navigator.userAgent.indexOf('Android') !== -1 &&
       navigator.userAgent.indexOf('Chrome') !== -1;
@@ -65,14 +44,14 @@ Util.isWebViewAndroid = (function() {
   };
 })();
 
-Util.isSafari = (function() {
+export const isSafari = (function() {
   var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
   return function() {
     return isSafari;
   };
 })();
 
-Util.isFirefoxAndroid = (function() {
+export const isFirefoxAndroid = (function() {
   var isFirefoxAndroid = navigator.userAgent.indexOf('Firefox') !== -1 &&
       navigator.userAgent.indexOf('Android') !== -1;
   return function() {
@@ -80,44 +59,44 @@ Util.isFirefoxAndroid = (function() {
   };
 })();
 
-Util.isR7 = (function() {
+export const isR7 = (function() {
   var isR7 = navigator.userAgent.indexOf('R7 Build') !== -1;
   return function() {
     return isR7;
   };
 })();
 
-Util.isLandscapeMode = function() {
+export const isLandscapeMode = function() {
   var rtn = (window.orientation == 90 || window.orientation == -90);
-  return Util.isR7() ? !rtn : rtn;
+  return isR7() ? !rtn : rtn;
 };
 
 // Helper method to validate the time steps of sensor timestamps.
-Util.isTimestampDeltaValid = function(timestampDeltaS) {
+export const isTimestampDeltaValid = function(timestampDeltaS) {
   if (isNaN(timestampDeltaS)) {
     return false;
   }
-  if (timestampDeltaS <= Util.MIN_TIMESTEP) {
+  if (timestampDeltaS <= MIN_TIMESTEP) {
     return false;
   }
-  if (timestampDeltaS > Util.MAX_TIMESTEP) {
+  if (timestampDeltaS > MAX_TIMESTEP) {
     return false;
   }
   return true;
 };
 
-Util.getScreenWidth = function() {
+export const getScreenWidth = function() {
   return Math.max(window.screen.width, window.screen.height) *
       window.devicePixelRatio;
 };
 
-Util.getScreenHeight = function() {
+export const getScreenHeight = function() {
   return Math.min(window.screen.width, window.screen.height) *
       window.devicePixelRatio;
 };
 
-Util.requestFullscreen = function(element) {
-  if (Util.isWebViewAndroid()) {
+export const requestFullscreen = function(element) {
+  if (isWebViewAndroid()) {
       return false;
   }
   if (element.requestFullscreen) {
@@ -135,7 +114,7 @@ Util.requestFullscreen = function(element) {
   return true;
 };
 
-Util.exitFullscreen = function() {
+export const exitFullscreen = function() {
   if (document.exitFullscreen) {
     document.exitFullscreen();
   } else if (document.webkitExitFullscreen) {
@@ -151,14 +130,14 @@ Util.exitFullscreen = function() {
   return true;
 };
 
-Util.getFullscreenElement = function() {
+export const getFullscreenElement = function() {
   return document.fullscreenElement ||
       document.webkitFullscreenElement ||
       document.mozFullScreenElement ||
       document.msFullscreenElement;
 };
 
-Util.linkProgram = function(gl, vertexSource, fragmentSource, attribLocationMap) {
+export const linkProgram = function(gl, vertexSource, fragmentSource, attribLocationMap) {
   // No error checking for brevity.
   var vertexShader = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(vertexShader, vertexSource);
@@ -183,7 +162,7 @@ Util.linkProgram = function(gl, vertexSource, fragmentSource, attribLocationMap)
   return program;
 };
 
-Util.getProgramUniforms = function(gl, program) {
+export const getProgramUniforms = function(gl, program) {
   var uniforms = {};
   var uniformCount = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
   var uniformName = '';
@@ -195,7 +174,7 @@ Util.getProgramUniforms = function(gl, program) {
   return uniforms;
 };
 
-Util.orthoMatrix = function (out, left, right, bottom, top, near, far) {
+export const orthoMatrix = function (out, left, right, bottom, top, near, far) {
   var lr = 1 / (left - right),
       bt = 1 / (bottom - top),
       nf = 1 / (near - far);
@@ -218,19 +197,19 @@ Util.orthoMatrix = function (out, left, right, bottom, top, near, far) {
   return out;
 };
 
-Util.copyArray = function (source, dest) {
+export const copyArray = function (source, dest) {
   for (var i = 0, n = source.length; i < n; i++) {
     dest[i] = source[i];
   }
 };
 
-Util.isMobile = function() {
+export const isMobile = function() {
   var check = false;
   (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4)))check = true})(navigator.userAgent||navigator.vendor||window.opera);
   return check;
 };
 
-Util.extend = function(dest, src) {
+export const extend = function(dest, src) {
   for (var key in src) {
     if (src.hasOwnProperty(key)) {
       dest[key] = src[key];
@@ -238,9 +217,9 @@ Util.extend = function(dest, src) {
   }
 
   return dest;
-}
+};
 
-Util.safariCssSizeWorkaround = function(canvas) {
+export const safariCssSizeWorkaround = function(canvas) {
   // TODO(smus): Remove this workaround when Safari for iOS is fixed.
   // iOS only workaround (for https://bugs.webkit.org/show_bug.cgi?id=152556).
   //
@@ -248,7 +227,7 @@ Util.safariCssSizeWorkaround = function(canvas) {
   //  from hell's heart I stab at thee;
   //  for hate's sake I spit my last breath at thee."
   // -- Moby Dick, by Herman Melville
-  if (Util.isIOS()) {
+  if (isIOS()) {
     var width = canvas.style.width;
     var height = canvas.style.height;
     canvas.style.width = (parseInt(width) + 1) + 'px';
@@ -260,11 +239,10 @@ Util.safariCssSizeWorkaround = function(canvas) {
   }
 
   // Debug only.
-  window.Util = Util;
   window.canvas = canvas;
 };
 
-Util.frameDataFromPose = (function() {
+export const frameDataFromPose = (function() {
   var piOver180 = Math.PI / 180.0;
   var rad45 = Math.PI * 0.25;
 
@@ -443,16 +421,16 @@ Util.frameDataFromPose = (function() {
 })();
 
 // via https://github.com/googlevr/webvr-polyfill/issues/271
-Util.isInsideCrossOriginIFrame = function() {
+export const isInsideCrossOriginIFrame = function() {
   var isFramed = (window.self !== window.top);
-  var refOrigin = Util.getOriginFromUrl(document.referrer);
-  var thisOrigin = Util.getOriginFromUrl(window.location.href);
+  var refOrigin = getOriginFromUrl(document.referrer);
+  var thisOrigin = getOriginFromUrl(window.location.href);
 
   return isFramed && (refOrigin !== thisOrigin);
 };
 
 // via https://github.com/googlevr/webvr-polyfill/issues/271
-Util.getOriginFromUrl = function(url) {
+export const getOriginFromUrl = function(url) {
   var domainIdx;
   var protoSepIdx = url.indexOf("://");
   if (protoSepIdx !== -1) {
@@ -467,7 +445,7 @@ Util.getOriginFromUrl = function(url) {
   return url.substring(0, domainEndIdx)
 };
 
-Util.getQuaternionAngle = function(quat) {
+export const getQuaternionAngle = function(quat) {
   // angle = 2 * acos(qw)
   // If w is greater than 1 (THREE.js, how can this be?), arccos is not defined.
   if (quat.w > 1) {
@@ -483,7 +461,7 @@ Util.getQuaternionAngle = function(quat) {
  * prints a console.warn with the message if this is the first
  * of `key`'s warnings.
  */
-Util.warnOnce = (function() {
+export const warnOnce = (function() {
   var observedWarnings = {};
 
   return function(key, message) {
@@ -494,11 +472,9 @@ Util.warnOnce = (function() {
   };
 })();
 
-Util.deprecateWarning = function (deprecated, suggested) {
+export const deprecateWarning = function(deprecated, suggested) {
   var alternative = suggested ? ('Please use ' + suggested + ' instead.') : '';
-  Util.warnOnce(deprecated, deprecated + ' has been deprecated. ' +
-                            'This may not work on native WebVR displays. ' +
-                            alternative);
+  warnOnce(deprecated, deprecated + ' has been deprecated. ' +
+           'This may not work on native WebVR displays. ' +
+           alternative);
 };
-
-module.exports = Util;

@@ -19,6 +19,7 @@ import json from 'rollup-plugin-json';
 import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import cleanup from 'rollup-plugin-cleanup';
+const babel = require('rollup-plugin-babel');
 
 const banner = fs.readFileSync(path.join(__dirname, 'licenses.txt'));
 
@@ -32,6 +33,10 @@ export default {
   banner: banner,
   plugins: [
     json(),
+    babel({
+      plugins: ['external-helpers'],
+      exclude: 'node_modules/**',
+    }),
     resolve(),
     commonjs(),
     cleanup(),

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-var Util = require('./util.js');
-var WGLUPreserveGLState = require('gl-preserve-state');
+import * as Util from './util.js';
+import WGLUPreserveGLState from 'gl-preserve-state';
 
 var uiVS = [
   'attribute vec2 position;',
@@ -282,4 +282,4 @@ CardboardUI.prototype.renderNoState = function() {
   gl.drawArrays(gl.TRIANGLE_STRIP, this.arrowOffset, this.arrowVertexCount);
 };
 
-module.exports = CardboardUI;
+export default CardboardUI;

@@ -60,4 +60,4 @@ Distortion.prototype.distort = function(radius) {
   return (ret + 1) * radius;
 };
 
-module.exports = Distortion;
+export default Distortion;

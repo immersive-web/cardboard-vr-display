@@ -15,8 +15,8 @@
 
 // Offline cache of the DPDB, to be used until we load the online one (and
 // as a fallback in case we can't load the online one).
-var DPDB_CACHE = require('webvr-polyfill-dpdb');
-var Util = require('./util.js');
+import DPDB_CACHE from 'webvr-polyfill-dpdb';
+import * as Util from './util.js';
 
 /**
  * Calculates device parameters based on the DPDB (Device Parameter Database).
@@ -173,4 +173,4 @@ function DeviceParams(params) {
   this.bevelMm = params.bevelMm;
 }
 
-module.exports = Dpdb;
+export default Dpdb;

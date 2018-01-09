@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-var Util = require('./util.js');
-var NoSleep = require('nosleep.js');
+import * as Util from './util.js';
+import NoSleep from 'nosleep.js';
 
 // Start at a higher number to reduce chance of conflict.
 var nextDisplayId = 1000;
@@ -26,16 +26,15 @@ var defaultRightBounds = [0.5, 0, 0.5, 1];
  * The base class for all VR frame data.
  */
 
-function VRFrameData() {
+export function VRFrameData() {
   this.leftProjectionMatrix = new Float32Array(16);
   this.leftViewMatrix = new Float32Array(16);
   this.rightProjectionMatrix = new Float32Array(16);
   this.rightViewMatrix = new Float32Array(16);
   this.pose = null;
 };
-module.exports.VRFrameData = VRFrameData;
 
-function VRDisplayCapabilities (config) {
+export function VRDisplayCapabilities (config) {
   Object.defineProperties(this, {
     hasPosition: {
       writable: false, enumerable: true, value: config.hasPosition,
@@ -58,12 +57,11 @@ function VRDisplayCapabilities (config) {
     },
   });
 }
-module.exports.VRDisplayCapabilities = VRDisplayCapabilities;
 
 /**
  * The base class for all VR displays.
  */
-function VRDisplay(config) {
+export function VRDisplay(config) {
   config = config || {};
   var USE_WAKELOCK = 'wakelock' in config ? config.wakelock : true;
 
@@ -508,5 +506,3 @@ VRDisplay.prototype.getEyeParameters = function(whichEye) {
   // Override to return accurate eye parameters if canPresent is true.
   return null;
 };
-
-module.exports.VRDisplay = VRDisplay;

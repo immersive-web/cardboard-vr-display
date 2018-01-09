@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-var Util = require('./util.js');
-var rotateInstructionsAsset = require('./assets/rotate-instructions.js');
+import * as Util from './util.js';
+import rotateInstructionsAsset from './assets/rotate-instructions.js';
 
 function RotateInstructions() {
   this.loadIcon_();
@@ -141,4 +141,4 @@ RotateInstructions.prototype.loadIcon_ = function() {
   this.icon = Util.base64('image/svg+xml', rotateInstructionsAsset);
 };
 
-module.exports = RotateInstructions;
+export default RotateInstructions;

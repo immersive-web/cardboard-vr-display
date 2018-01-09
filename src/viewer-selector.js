@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-var DeviceInfo = require('./device-info.js');
-var Util = require('./util.js');
+import DeviceInfo from './device-info.js';
+import * as Util from './util.js';
 
-var DEFAULT_VIEWER = 'CardboardV1';
-var VIEWER_KEY = 'WEBVR_CARDBOARD_VIEWER';
-var CLASS_NAME = 'webvr-polyfill-viewer-selector';
+const DEFAULT_VIEWER = 'CardboardV1';
+const VIEWER_KEY = 'WEBVR_CARDBOARD_VIEWER';
+const CLASS_NAME = 'webvr-polyfill-viewer-selector';
 
 /**
  * Creates a viewer selector with the options specified. Supports being shown
@@ -208,4 +208,4 @@ ViewerSelector.prototype.createButton_ = function(label, onclick) {
   return button;
 };
 
-module.exports = ViewerSelector;
+export default ViewerSelector;

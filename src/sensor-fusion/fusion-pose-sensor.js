@@ -12,25 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var ComplementaryFilter = require('./complementary-filter.js');
-var PosePredictor = require('./pose-predictor.js');
-var TouchPanner = require('../touch-panner.js');
-var MathUtil = require('../math-util.js');
-var Util = require('../util.js');
+import ComplementaryFilter from './complementary-filter.js';
+import PosePredictor from './pose-predictor.js';
+import * as MathUtil from '../math-util.js';
+import * as Util from '../util.js';
 
 /**
  * The pose sensor, implemented using DeviceMotion APIs.
  *
  * @param {number} kFilter
  * @param {number} predictionTime
- * @param {boolean} touchPannerDisabled
  * @param {boolean} yawOnly
  * @param {boolean} isDebug
  */
-function FusionPoseSensor(kFilter, predictionTime, touchPannerDisabled, yawOnly, isDebug) {
-  this.deviceId = 'webvr-polyfill:fused';
-  this.deviceName = 'VR Position Device (webvr-polyfill:fused)';
-  this.touchPannerDisabled = touchPannerDisabled;
+function FusionPoseSensor(kFilter, predictionTime, yawOnly, isDebug) {
   this.yawOnly = yawOnly;
 
   this.accelerometer = new MathUtil.Vector3();
@@ -40,7 +35,6 @@ function FusionPoseSensor(kFilter, predictionTime, touchPannerDisabled, yawOnly,
 
   this.filter = new ComplementaryFilter(kFilter, isDebug);
   this.posePredictor = new PosePredictor(predictionTime, isDebug);
-  this.touchPanner = new TouchPanner();
 
   this.filterToWorldQ = new MathUtil.Quaternion();
 
@@ -89,9 +83,6 @@ FusionPoseSensor.prototype.getOrientation = function() {
   var out = new MathUtil.Quaternion();
   out.copy(this.filterToWorldQ);
   out.multiply(this.resetQ);
-  if (!this.touchPannerDisabled) {
-    out.multiply(this.touchPanner.getOrientation());
-  }
   out.multiply(this.predictedQ);
   out.multiply(this.worldToScreenQ);
 
@@ -125,10 +116,6 @@ FusionPoseSensor.prototype.resetPose = function() {
 
   // Take into account original pose.
   this.resetQ.multiply(this.originalPoseAdjustQ);
-
-  if (!this.touchPannerDisabled) {
-    this.touchPanner.resetSensor();
-  }
 };
 
 FusionPoseSensor.prototype.onDeviceMotion_ = function(deviceMotion) {
@@ -245,4 +232,4 @@ FusionPoseSensor.prototype.stop = function() {
   window.removeEventListener('message', this.onMessageCallback_);
 };
 
-module.exports = FusionPoseSensor;
+export default FusionPoseSensor;
