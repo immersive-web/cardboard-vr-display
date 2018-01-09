@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var MathUtil = require('../math-util');
+import * as MathUtil from '../math-util.js';
 
 /**
  * Given an orientation and the gyroscope data, predicts the future orientation
@@ -78,4 +78,4 @@ PosePredictor.prototype.getPrediction = function(currentQ, gyro, timestampS) {
 };
 
 
-module.exports = PosePredictor;
+export default PosePredictor;

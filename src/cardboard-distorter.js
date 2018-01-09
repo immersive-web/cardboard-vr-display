@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-var Util = require('./util.js');
-var WGLUPreserveGLState = require('gl-preserve-state');
+import * as Util from './util.js';
+import WGLUPreserveGLState from 'gl-preserve-state';
 
 var distortionVS = [
   'attribute vec2 position;',
@@ -647,4 +647,4 @@ CardboardDistorter.prototype.getOwnPropertyDescriptor_ = function(proto, attrNam
   return descriptor;
 };
 
-module.exports = CardboardDistorter;
+export default CardboardDistorter;

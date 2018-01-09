@@ -13,17 +13,16 @@
  * limitations under the License.
  */
 
-var CardboardDistorter = require('./cardboard-distorter.js');
-var CardboardUI = require('./cardboard-ui.js');
-var DeviceInfo = require('./device-info.js');
-var Dpdb = require('./dpdb.js');
-var FusionPoseSensor = require('./sensor-fusion/fusion-pose-sensor.js');
-var RotateInstructions = require('./rotate-instructions.js');
-var ViewerSelector = require('./viewer-selector.js');
-var VRDisplay = require('./base.js').VRDisplay;
-var VRDisplayCapabilities = require('./base.js').VRDisplayCapabilities;
-var Util = require('./util.js');
-var Options = require('./options');
+import CardboardDistorter from './cardboard-distorter.js';
+import CardboardUI from './cardboard-ui.js';
+import DeviceInfo from './device-info.js';
+import Dpdb from './dpdb.js';
+import FusionPoseSensor from './sensor-fusion/fusion-pose-sensor.js';
+import RotateInstructions from './rotate-instructions.js';
+import ViewerSelector from './viewer-selector.js';
+import { VRDisplay, VRDisplayCapabilities } from './base.js';
+import * as Util from './util.js';
+import Options from './options.js';
 
 var Eye = {
   LEFT: 'left',
@@ -59,7 +58,6 @@ function CardboardVRDisplay(config) {
   this.bufferScale_ = this.config.BUFFER_SCALE;
   this.poseSensor_ = new FusionPoseSensor(this.config.K_FILTER,
                                           this.config.PREDICTION_TIME_S,
-                                          this.config.TOUCH_PANNER_DISABLED,
                                           this.config.YAW_ONLY,
                                           this.config.DEBUG);
   this.distorter_ = null;
@@ -337,4 +335,4 @@ CardboardVRDisplay.prototype.fireVRDisplayDeviceParamsChange_ = function() {
   window.dispatchEvent(event);
 };
 
-module.exports = CardboardVRDisplay;
+export default CardboardVRDisplay;

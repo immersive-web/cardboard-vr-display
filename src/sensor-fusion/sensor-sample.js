@@ -26,4 +26,4 @@ SensorSample.prototype.copy = function(sensorSample) {
   this.set(sensorSample.sample, sensorSample.timestampS);
 };
 
-module.exports = SensorSample;
+export default SensorSample;

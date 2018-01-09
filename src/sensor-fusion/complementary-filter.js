@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-var SensorSample = require('./sensor-sample.js');
-var MathUtil = require('../math-util.js');
-var Util = require('../util.js');
+import SensorSample from './sensor-sample.js';
+import * as MathUtil from '../math-util.js';
+import * as Util from '../util.js';
 
 /**
  * An implementation of a simple complementary filter, which fuses gyroscope and
@@ -164,4 +164,4 @@ ComplementaryFilter.prototype.gyroToQuaternionDelta_ = function(gyro, dt) {
 };
 
 
-module.exports = ComplementaryFilter;
+export default ComplementaryFilter;

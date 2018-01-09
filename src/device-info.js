@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-var Distortion = require('./distortion/distortion.js');
-var MathUtil = require('./math-util.js');
-var Util = require('./util.js');
+import Distortion from './distortion.js';
+import { radToDeg, degToRad } from './math-util.js';
+import * as Util from './util.js';
 
 function Device(params) {
   this.width = params.width || Util.getScreenWidth();
@@ -141,13 +141,13 @@ DeviceInfo.prototype.getDistortedFieldOfViewLeftEye = function() {
   var bottomDist = viewer.baselineLensDistance - device.bevelMeters;
   var topDist = device.heightMeters - bottomDist;
 
-  var outerAngle = MathUtil.radToDeg * Math.atan(
+  var outerAngle = radToDeg * Math.atan(
       distortion.distort(outerDist / eyeToScreenDistance));
-  var innerAngle = MathUtil.radToDeg * Math.atan(
+  var innerAngle = radToDeg * Math.atan(
       distortion.distort(innerDist / eyeToScreenDistance));
-  var bottomAngle = MathUtil.radToDeg * Math.atan(
+  var bottomAngle = radToDeg * Math.atan(
       distortion.distort(bottomDist / eyeToScreenDistance));
-  var topAngle = MathUtil.radToDeg * Math.atan(
+  var topAngle = radToDeg * Math.atan(
       distortion.distort(topDist / eyeToScreenDistance));
 
   return {
@@ -168,10 +168,10 @@ DeviceInfo.prototype.getLeftEyeVisibleTanAngles = function() {
   var distortion = this.distortion;
 
   // Tan-angles from the max FOV.
-  var fovLeft = Math.tan(-MathUtil.degToRad * viewer.fov);
-  var fovTop = Math.tan(MathUtil.degToRad * viewer.fov);
-  var fovRight = Math.tan(MathUtil.degToRad * viewer.fov);
-  var fovBottom = Math.tan(-MathUtil.degToRad * viewer.fov);
+  var fovLeft = Math.tan(-degToRad * viewer.fov);
+  var fovTop = Math.tan(degToRad * viewer.fov);
+  var fovRight = Math.tan(degToRad * viewer.fov);
+  var fovBottom = Math.tan(-degToRad * viewer.fov);
   // Viewport size.
   var halfWidth = device.widthMeters / 4;
   var halfHeight = device.heightMeters / 2;
@@ -205,10 +205,10 @@ DeviceInfo.prototype.getLeftEyeNoLensTanAngles = function() {
 
   var result = new Float32Array(4);
   // Tan-angles from the max FOV.
-  var fovLeft = distortion.distortInverse(Math.tan(-MathUtil.degToRad * viewer.fov));
-  var fovTop = distortion.distortInverse(Math.tan(MathUtil.degToRad * viewer.fov));
-  var fovRight = distortion.distortInverse(Math.tan(MathUtil.degToRad * viewer.fov));
-  var fovBottom = distortion.distortInverse(Math.tan(-MathUtil.degToRad * viewer.fov));
+  var fovLeft = distortion.distortInverse(Math.tan(-degToRad * viewer.fov));
+  var fovTop = distortion.distortInverse(Math.tan(degToRad * viewer.fov));
+  var fovRight = distortion.distortInverse(Math.tan(degToRad * viewer.fov));
+  var fovBottom = distortion.distortInverse(Math.tan(-degToRad * viewer.fov));
   // Viewport size.
   var halfWidth = device.widthMeters / 4;
   var halfHeight = device.heightMeters / 2;
@@ -275,10 +275,10 @@ DeviceInfo.prototype.getUndistortedFieldOfViewLeftEye = function() {
   var p = this.getUndistortedParams_();
 
   return {
-    leftDegrees: MathUtil.radToDeg * Math.atan(p.outerDist),
-    rightDegrees: MathUtil.radToDeg * Math.atan(p.innerDist),
-    downDegrees: MathUtil.radToDeg * Math.atan(p.bottomDist),
-    upDegrees: MathUtil.radToDeg * Math.atan(p.topDist)
+    leftDegrees: radToDeg * Math.atan(p.outerDist),
+    rightDegrees: radToDeg * Math.atan(p.innerDist),
+    downDegrees: radToDeg * Math.atan(p.bottomDist),
+    upDegrees: radToDeg * Math.atan(p.topDist)
   };
 };
 
@@ -320,7 +320,7 @@ DeviceInfo.prototype.getUndistortedParams_ = function() {
   var eyePosY = (viewer.baselineLensDistance - device.bevelMeters) / eyeToScreenDistance;
 
   var maxFov = viewer.fov;
-  var viewerMax = distortion.distortInverse(Math.tan(MathUtil.degToRad * maxFov));
+  var viewerMax = distortion.distortInverse(Math.tan(degToRad * maxFov));
   var outerDist = Math.min(eyePosX, viewerMax);
   var innerDist = Math.min(halfLensDistance, viewerMax);
   var bottomDist = Math.min(eyePosY, viewerMax);
@@ -362,4 +362,4 @@ function CardboardViewer(params) {
 
 // Export viewer information.
 DeviceInfo.Viewers = Viewers;
-module.exports = DeviceInfo;
+export default DeviceInfo;
