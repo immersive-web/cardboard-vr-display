@@ -46,6 +46,7 @@ html, body, iframe {
   iframe.src = 'index.html';
   iframe.width = '100%';
   iframe.height = '100%';
+  iframe.setAttribute('allow', 'gyroscope; accelerometer');
   document.body.appendChild(iframe);
 
   // iOS, cross-origin iframes cannot access devicemotion events, so the parent
