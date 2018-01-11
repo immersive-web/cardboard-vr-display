@@ -17,7 +17,7 @@ import CardboardDistorter from './cardboard-distorter.js';
 import CardboardUI from './cardboard-ui.js';
 import DeviceInfo from './device-info.js';
 import Dpdb from './dpdb.js';
-import FusionPoseSensor from './sensor-fusion/fusion-pose-sensor.js';
+import PoseSensor from './pose-sensor.js';
 import RotateInstructions from './rotate-instructions.js';
 import ViewerSelector from './viewer-selector.js';
 import { VRDisplay, VRDisplayCapabilities } from './base.js';
@@ -56,10 +56,7 @@ function CardboardVRDisplay(config) {
 
   // "Private" members.
   this.bufferScale_ = this.config.BUFFER_SCALE;
-  this.poseSensor_ = new FusionPoseSensor(this.config.K_FILTER,
-                                          this.config.PREDICTION_TIME_S,
-                                          this.config.YAW_ONLY,
-                                          this.config.DEBUG);
+  this.poseSensor_ = new PoseSensor(this.config);
   this.distorter_ = null;
   this.cardboardUI_ = null;
 
@@ -85,7 +82,7 @@ CardboardVRDisplay.prototype = Object.create(VRDisplay.prototype);
 
 CardboardVRDisplay.prototype._getPose = function() {
   return {
-    position: this.poseSensor_.getPosition(),
+    position: null,
     orientation: this.poseSensor_.getOrientation(),
     linearVelocity: null,
     linearAcceleration: null,
@@ -95,7 +92,11 @@ CardboardVRDisplay.prototype._getPose = function() {
 }
 
 CardboardVRDisplay.prototype._resetPose = function() {
-  this.poseSensor_.resetPose();
+  // The non-devicemotion PoseSensor does not have resetPose implemented
+  // as it has been deprecated from spec.
+  if (this.poseSensor_.resetPose) {
+    this.poseSensor_.resetPose();
+  }
 };
 
 CardboardVRDisplay.prototype._getFieldOfView = function(whichEye) {
