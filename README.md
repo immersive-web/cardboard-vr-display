@@ -13,24 +13,47 @@ rather than this. This component **does not** polyfill interfaces like `VRFrameD
 
 ## How It Works
 
-`CardboardVRDisplay` uses DeviceMotionEvents to implement a complementary
-filter which does [sensor fusion and pose prediction][fusion] to provide
-orientation tracking. It can also render in stereo mode, and includes mesh-based
+As of [1.0.4](https://github.com/immersive-web/cardboard-vr-display/tree/v1.0.4), `CardboardVRDisplay` uses [RelativeOrientationSensor] for orientation tracking,
+falling back to [DeviceMotionEvents] using [sensor fusion and pose prediction][fusion].
+[RelativeOrientationSensor] is a new API ([read more about the new Sensors on the web][sensors])
+first implemented in Chrome M63. This API uses the new [Feature Policy] specification which allows
+developers to selectively enable or disable browser features.
+
+It can also render in stereo mode, and includes mesh-based
 lens distortion. This display also includes user interface elements in VR mode
 to make the VR experience more intuitive, including:
 
-- A gear icon to select your VR viewer.
-- A back button to exit VR mode.
-- An interstitial which only appears in portrait orientation, requesting you switch
+* A gear icon to select your VR viewer.
+* A back button to exit VR mode.
+* An interstitial which only appears in portrait orientation, requesting you switch
   into landscape orientation (if [orientation lock][ol] is not available).
 
-[fusion]: http://smus.com/sensor-fusion-prediction-webvr/
-[ol]: https://www.w3.org/TR/screen-orientation/
+### iframes
 
-### I-Frames
+By default, main frames and same-origin iframes have access to Sensor APIs,
+but cross-origin iframes must specify feature policy and allow `gyroscope` and
+`accelerometer` features. If your experience is attempting to use the native
+[WebXR Device API] in an iframe, you'll have to specify that feature as well ([WebXR's
+feature name may change](https://github.com/immersive-web/webxr/issues/308)). All of these features require HTTPS to function, except for `localhost`, where HTTP is allowed.
 
-On iOS, cross-origin iframes do not have access to the `devicemotion` events. The CardboardVRDisplay however
-does respond to events passed in from a parent frame via `postMessage`. See the [iframe example][iframe-example] to see how the events must be formatted.
+```html
+<iframe src="https://otherdomain.com" allow="gyroscope; accelerometer; xr"></iframe>
+```
+
+While `devicemotion` is a fallback for Sensors, eventually `devicemotion` will be behind the same
+Feature Policy as Sensors and it is encouraged to adhere to these policies in the meantime.
+If the Feature Policy for Sensors is denied, `CardboardVRDisplay` will **not** always attempt
+to fall back to `devicemotion`. Using Feature Policies now will guarantee a more future-proof experience.
+
+#### Caveats
+
+* On iOS, cross-origin iframes do not have access to the `devicemotion` events.
+  The `CardboardVRDisplay` however does respond to events passed in from a parent
+  frame via `postMessage`. See the [iframe example][iframe-example] to see how
+  the events must be formatted.
+* Chrome M63 supports Sensors, although not the corresponding Feature Policy [until Chrome M65][sensors-main-frame].
+  This results in Chrome M63/M64 only supporting Sensors in main frames, and these browsers
+  will fall back to using devicemotion if in iframes.
 
 ### Magic Window
 
@@ -147,11 +170,18 @@ View all config options at `src/options.js`.
 This program is free software for both commercial and non-commercial use,
 distributed under the [Apache 2.0 License](LICENSE).
 
-[VRDisplay]: https://w3c.github.io/webvr/spec/1.1/#interface-vrdisplay
-[WebVR API 1.1]: https://w3c.github.io/webvr/spec/1.1
-[WebVR API]: https://w3c.github.io/webvr/spec/latest
+[VRDisplay]: https://immersive-web.github.io/webvr/spec/1.1/#interface-vrdisplay
+[WebVR API]: https://immersive-web.github.io/webvr/spec/1.1/
+[WebXR Device API]: https://immersive-web.github.io/webxr/spec/latest/
 [webvr-polyfill]: https://github.com/immersive-web/webvr-polyfill
 [example]: https://immersive-web.github.io/cardboard-vr-display/examples
 [iframe-example]: examples/iframe.html
 [magicwindow-example]: examples/magicwindow.html
 [index.html]: https://immersive-web.github.io/cardboard-vr-display
+[fusion]: http://smus.com/sensor-fusion-prediction-webvr/
+[ol]: https://www.w3.org/TR/screen-orientation/
+[sensors]: https://developers.google.com/web/updates/2017/09/sensors-for-the-web
+[DeviceMotionEvents]: https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent
+[RelativeOrientationSensor]: https://www.w3.org/TR/orientation-sensor/#relativeorientationsensor-model
+[Feature Policy]: https://wicg.github.io/feature-policy/
+[sensors-main-frame]: https://developers.google.com/web/updates/2017/09/sensors-for-the-web#feature_policy_integration
