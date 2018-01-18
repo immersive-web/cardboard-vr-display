@@ -1,6 +1,6 @@
 # cardboard-vr-display
 
-[![Build Status](http://img.shields.io/travis/googlevr/cardboard-vr-display.svg?style=flat-square)](https://travis-ci.org/googlevr/cardboard-vr-display)
+[![Build Status](http://img.shields.io/travis/immersive-web/cardboard-vr-display.svg?style=flat-square)](https://travis-ci.org/immersive-web/cardboard-vr-display)
 [![Build Status](http://img.shields.io/npm/v/cardboard-vr-display.svg?style=flat-square)](https://www.npmjs.org/package/cardboard-vr-display)
 
 A JavaScript implementation of a [WebVR 1.1 VRDisplay][VRDisplay]. This is the magic
@@ -139,7 +139,7 @@ frame.pose; // { orientation, position }
 View the [example] to see a demo running the CardboardVRDisplay. This executes
 a minimal WebVR 1.1 polyfill and parses query params to inject configuration parameters.
 View some premade links at [index.html]. For example, to set the buffer scale to 1.0
-and limit rotation to yaw, go to [https://googlevr.github.io/cardboard-vr-display/examples/index.html?YAW_ONLY=true&BUFFER_SCALE=1.0].
+and limit rotation to yaw, go to [https://immersive-web.github.io/cardboard-vr-display/examples/index.html?YAW_ONLY=true&BUFFER_SCALE=1.0].
 View all config options at `src/options.js`.
 
 ## License
@@ -150,8 +150,8 @@ distributed under the [Apache 2.0 License](LICENSE).
 [VRDisplay]: https://w3c.github.io/webvr/spec/1.1/#interface-vrdisplay
 [WebVR API 1.1]: https://w3c.github.io/webvr/spec/1.1
 [WebVR API]: https://w3c.github.io/webvr/spec/latest
-[webvr-polyfill]: https://github.com/googlevr/webvr-polyfill
-[example]: https://googlevr.github.io/cardboard-vr-display/examples
+[webvr-polyfill]: https://github.com/immersive-web/webvr-polyfill
+[example]: https://immersive-web.github.io/cardboard-vr-display/examples
 [iframe-example]: examples/iframe.html
 [magicwindow-example]: examples/magicwindow.html
-[index.html]: https://googlevr.github.io/cardboard-vr-display
+[index.html]: https://immersive-web.github.io/cardboard-vr-display

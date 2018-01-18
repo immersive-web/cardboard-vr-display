@@ -420,7 +420,7 @@ export const frameDataFromPose = (function() {
   };
 })();
 
-// via https://github.com/googlevr/webvr-polyfill/issues/271
+// via https://github.com/immersive-web/webvr-polyfill/issues/271
 export const isInsideCrossOriginIFrame = function() {
   var isFramed = (window.self !== window.top);
   var refOrigin = getOriginFromUrl(document.referrer);
@@ -429,7 +429,7 @@ export const isInsideCrossOriginIFrame = function() {
   return isFramed && (refOrigin !== thisOrigin);
 };
 
-// via https://github.com/googlevr/webvr-polyfill/issues/271
+// via https://github.com/immersive-web/webvr-polyfill/issues/271
 export const getOriginFromUrl = function(url) {
   var domainIdx;
   var protoSepIdx = url.indexOf("://");

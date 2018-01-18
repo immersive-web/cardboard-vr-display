@@ -1,7 +1,7 @@
 {
   "name": "cardboard-vr-display",
   "version": "1.0.3",
-  "homepage": "https://github.com/googlevr/cardboard-vr-display",
+  "homepage": "https://github.com/immersive-web/cardboard-vr-display",
   "authors": [
     "Boris Smus <boris@smus.com>",
     "Brandon Jones <tojiro@gmail.com>",
@@ -32,9 +32,9 @@
     "version": "npm run build && git add dist/*",
     "postversion": "git push && git push --tags && npm publish"
   },
-  "repository": "googlevr/cardboard-vr-display",
+  "repository": "immersive-web/cardboard-vr-display",
   "bugs": {
-    "url": "https://github.com/googlevr/cardboard-vr-display/issues"
+    "url": "https://github.com/immersive-web/cardboard-vr-display/issues"
   },
   "dependencies": {
     "gl-preserve-state": "^1.0.0",
