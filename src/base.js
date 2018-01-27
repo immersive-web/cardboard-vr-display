@@ -95,10 +95,13 @@ export function VRDisplay(config) {
   // "Private" members.
   this.waitingForPresent_ = false;
   this.layer_ = null;
-  // In WebVR 2.0, the context's canvas doesn't have
-  // to be in the DOM at all; if we have to inject it,
-  // set orphanedLayer to true so we can remove it later
-  this.orphanedLayer = null;
+  // Keep track of the original parent of the source passed into
+  // `requestPresent`. While the fullscreenWrapper will be a child of the parent
+  // in most cases, we must keep track when there's no parent (like
+  // when it was never in the DOM, e.g. WebXR polyfill), or if the `source`
+  // changes during presentation (in which case we need something to track
+  // the newer `source`'s parent when we clean up).
+  this.originalParent_ = null;
 
   this.fullscreenElement_ = null;
   this.fullscreenWrapper_ = null;
@@ -176,13 +179,36 @@ VRDisplay.prototype.wrapForFullscreen = function(element) {
     return this.fullscreenWrapper_;
   }
 
-  // Remove any previously applied wrappers
-  this.removeFullscreenWrapper();
+  // If fullscreenElement_ already exists, swap it out with the new element.
+  // This is necessary for changing the layer's `source` context, beyond just
+  // changing the bounds. This is used in the WebXRPolyfill, which calls requestPresent
+  // twice -- once with a dummy canvas to call requestFullscreen immediately after
+  // a user gesture, and again once an `XRSession`'s `baseLayer` is set (with the
+  // real canvas).
+  if (this.fullscreenElement_) {
+    // Move the current fullscreenElement_ back to its originalParent_
+    if (this.originalParent_) {
+      this.originalParent_.appendChild(this.fullscreenElement_);
+    } else {
+      this.fullscreenElement_.parentElement.removeChild(this.fullscreenElement_);
+    }
+  }
 
   this.fullscreenElement_ = element;
-  var parent = this.fullscreenElement_.parentElement;
-  parent.insertBefore(this.fullscreenWrapper_, this.fullscreenElement_);
-  parent.removeChild(this.fullscreenElement_);
+  this.originalParent_ = element.parentElement;
+  // We may have to inject the canvas in the DOM
+  if (!this.originalParent_) {
+    document.body.appendChild(element);
+  }
+
+  // If the fullscreenWrapper is already in the DOM, don't move it. Otherwise,
+  // make it a child of `element`'s parent.
+  if (!this.fullscreenWrapper_.parentElement) {
+    var parent = this.fullscreenElement_.parentElement;
+    parent.insertBefore(this.fullscreenWrapper_, this.fullscreenElement_);
+    parent.removeChild(this.fullscreenElement_);
+  }
+
   this.fullscreenWrapper_.insertBefore(this.fullscreenElement_, this.fullscreenWrapper_.firstChild);
   this.fullscreenElementCachedStyle_ = this.fullscreenElement_.getAttribute('style');
 
@@ -227,13 +253,18 @@ VRDisplay.prototype.removeFullscreenWrapper = function() {
 
   var parent = this.fullscreenWrapper_.parentElement;
   this.fullscreenWrapper_.removeChild(element);
-  parent.insertBefore(element, this.fullscreenWrapper_);
-  parent.removeChild(this.fullscreenWrapper_);
 
-  if (this.orphanedLayer) {
-    element.parentElement.removeChild(element);
+  if (this.originalParent_ === parent) {
+    parent.insertBefore(element, this.fullscreenWrapper_);
+  }
+  // If it has an original parent but different than the wrapper parent,
+  // make a best attempt at reinserting into the DOM. This occurs when swapping
+  // canvases during a presentation.
+  else if (this.originalParent_) {
+    this.originalParent_.appendChild(element);
   }
 
+  parent.removeChild(this.fullscreenWrapper_);
 
   return element;
 };
@@ -283,6 +314,9 @@ VRDisplay.prototype.requestPresent = function(layers) {
         layer.rightBounds[i] = rightBounds[i];
       }
 
+      // Call another wrap to swap out canvases in the fullscreen wrapper.
+      self.wrapForFullscreen(self.layer_.source);
+      self.updatePresent_();
       resolve();
       return;
     }
@@ -297,12 +331,6 @@ VRDisplay.prototype.requestPresent = function(layers) {
 
     self.waitingForPresent_ = false;
     if (self.layer_ && self.layer_.source) {
-
-      // We may have to inject the canvas in the DOM
-      if (!self.layer_.source.parentElement) {
-        self.orphanedLayer = true;
-        document.body.appendChild(self.layer_.source);
-      }
 
       var fullscreenElement = self.wrapForFullscreen(self.layer_.source);
 

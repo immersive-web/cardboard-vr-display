@@ -253,6 +253,15 @@ CardboardVRDisplay.prototype.endPresent_ = function() {
   window.removeEventListener('vrdisplaypresentchange', this.vrdisplaypresentchangeHandler);
 };
 
+/**
+ * Called when the layer's `source` changes to a new canvas.
+ * Used to re-setup the distortions and UI with new context.
+ */
+CardboardVRDisplay.prototype.updatePresent_ = function() {
+  this.endPresent_();
+  this.beginPresent_();
+};
+
 CardboardVRDisplay.prototype.submitFrame = function(pose) {
   if (this.distorter_) {
     this.updateBounds_();
