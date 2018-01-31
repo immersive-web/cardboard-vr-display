@@ -20,7 +20,7 @@
     "rollup-plugin-json": "^2.3.0",
     "rollup-plugin-node-resolve": "^3.0.0"
   },
-  "main": "src/cardboard-vr-display",
+  "main": "dist/cardboard-vr-display",
   "keywords": [
     "vr",
     "webvr"
