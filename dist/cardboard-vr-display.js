@@ -2603,6 +2603,8 @@ var src = NoSleep;
 var nextDisplayId = 1000;
 var defaultLeftBounds = [0, 0, 0.5, 1];
 var defaultRightBounds = [0.5, 0, 0.5, 1];
+var raf = window.requestAnimationFrame;
+var caf = window.cancelAnimationFrame;
 
 function VRDisplayCapabilities(config) {
   Object.defineProperties(this, {
@@ -2678,10 +2680,10 @@ VRDisplay.prototype.getImmediatePose = function () {
   return this._getPose();
 };
 VRDisplay.prototype.requestAnimationFrame = function (callback) {
-  return window.requestAnimationFrame(callback);
+  return raf(callback);
 };
 VRDisplay.prototype.cancelAnimationFrame = function (id) {
-  return window.cancelAnimationFrame(id);
+  return caf(id);
 };
 VRDisplay.prototype.wrapForFullscreen = function (element) {
   if (isIOS()) {
