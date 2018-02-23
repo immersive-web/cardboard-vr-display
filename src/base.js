@@ -22,6 +22,9 @@ var nextDisplayId = 1000;
 var defaultLeftBounds = [0, 0, 0.5, 1];
 var defaultRightBounds = [0.5, 0, 0.5, 1];
 
+var raf = window.requestAnimationFrame;
+var caf = window.cancelAnimationFrame;
+
 /**
  * The base class for all VR frame data.
  */
@@ -146,11 +149,11 @@ VRDisplay.prototype.getImmediatePose = function() {
 };
 
 VRDisplay.prototype.requestAnimationFrame = function(callback) {
-  return window.requestAnimationFrame(callback);
+  return raf(callback);
 };
 
 VRDisplay.prototype.cancelAnimationFrame = function(id) {
-  return window.cancelAnimationFrame(id);
+  return caf(id);
 };
 
 VRDisplay.prototype.wrapForFullscreen = function(element) {
