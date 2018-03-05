@@ -62,6 +62,10 @@ function FusionPoseSensor(kFilter, predictionTime, yawOnly, isDebug) {
 
   this.isFirefoxAndroid = Util.isFirefoxAndroid();
   this.isIOS = Util.isIOS();
+  // Chrome as of m66 started reporting `rotationRate` in degrees rather
+  // than radians, to be consistent with other browsers.
+  // https://github.com/immersive-web/cardboard-vr-display/issues/18
+  this.isChromeUsingDegrees = Util.getChromeVersion() >= 66;
 
   this.orientationOut_ = new Float32Array(4);
 }
@@ -153,9 +157,9 @@ FusionPoseSensor.prototype.updateDeviceMotion_ = function(deviceMotion) {
     this.gyroscope.set(rotRate.alpha, rotRate.beta, rotRate.gamma);
   }
 
-  // With iOS and Firefox Android, rotationRate is reported in degrees,
-  // so we first convert to radians.
-  if (this.isIOS || this.isFirefoxAndroid) {
+  // Browsers on iOS, Firefox/Android, and Chrome m66/Android `rotationRate`
+  // is reported in degrees, so we first convert to radians.
+  if (this.isIOS || this.isFirefoxAndroid || this.isChromeUsingDegrees) {
     this.gyroscope.multiplyScalar(Math.PI / 180);
   }
 

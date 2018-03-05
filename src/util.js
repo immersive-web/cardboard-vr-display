@@ -59,6 +59,18 @@ export const isFirefoxAndroid = (function() {
   };
 })();
 
+/**
+ * Returns a number value indiciating the version of Chrome being used,
+ * or otherwise `null` if not on Chrome.
+ */
+export const getChromeVersion = (function() {
+  const match = navigator.userAgent.match(/.*Chrome\/([0-9]+)/);
+  const value = match ? parseInt(match[1], 10) : null;
+  return function() {
+    return value;
+  };
+})();
+
 export const isR7 = (function() {
   var isR7 = navigator.userAgent.indexOf('R7 Build') !== -1;
   return function() {
