@@ -31,8 +31,6 @@ function FusionPoseSensor(kFilter, predictionTime, yawOnly, isDebug) {
   this.accelerometer = new MathUtil.Vector3();
   this.gyroscope = new MathUtil.Vector3();
 
-  this.start();
-
   this.filter = new ComplementaryFilter(kFilter, isDebug);
   this.posePredictor = new PosePredictor(predictionTime, isDebug);
 
@@ -65,9 +63,16 @@ function FusionPoseSensor(kFilter, predictionTime, yawOnly, isDebug) {
   // Chrome as of m66 started reporting `rotationRate` in degrees rather
   // than radians, to be consistent with other browsers.
   // https://github.com/immersive-web/cardboard-vr-display/issues/18
-  this.isChromeUsingDegrees = Util.getChromeVersion() >= 66;
+  let chromeVersion = Util.getChromeVersion();
+  this.isDeviceMotionInRadians = !this.isIOS && chromeVersion && chromeVersion < 66;
+  // In Chrome m65 there's a regression of devicemotion events. Fallback
+  // to using deviceorientation for these specific builds. More information
+  // at `Util.isChromeWithoutDeviceMotion`.
+  this.isWithoutDeviceMotion = Util.isChromeWithoutDeviceMotion();
 
   this.orientationOut_ = new Float32Array(4);
+
+  this.start();
 }
 
 FusionPoseSensor.prototype.getPosition = function() {
@@ -76,18 +81,54 @@ FusionPoseSensor.prototype.getPosition = function() {
 };
 
 FusionPoseSensor.prototype.getOrientation = function() {
-  // Convert from filter space to the the same system used by the
-  // deviceorientation event.
-  var orientation = this.filter.getOrientation();
+  let orientation;
 
-  // Predict orientation.
-  this.predictedQ = this.posePredictor.getPrediction(orientation, this.gyroscope, this.previousTimestampS);
+  // Hack around using deviceorientation instead of devicemotion
+  if (this.isWithoutDeviceMotion && this._deviceOrientationQ) {
+    // We must rotate 90 degrees on the Y axis to get the correct
+    // orientation of looking down the -Z axis.
+    this.deviceOrientationFixQ = this.deviceOrientationFixQ || (function () {
+      const z = new MathUtil.Quaternion().setFromAxisAngle(new MathUtil.Vector3(0, 0, -1), 0);
+      const y = new MathUtil.Quaternion().setFromAxisAngle(new MathUtil.Vector3(0, 1, 0), Math.PI / 2);
+      return z.multiply(y);
+    })();
+    orientation = this._deviceOrientationQ;
+    var out = new MathUtil.Quaternion();
+    out.copy(orientation);
+    out.multiply(this.filterToWorldQ);
+    out.multiply(this.resetQ);
+    out.multiply(this.worldToScreenQ);
+    out.multiplyQuaternions(this.deviceOrientationFixQ, out);
+
+    // Handle the yaw-only case.
+    if (this.yawOnly) {
+      // Make a quaternion that only turns around the Y-axis.
+      out.x = 0;
+      out.z = 0;
+      out.normalize();
+    }
+
+    this.orientationOut_[0] = out.x;
+    this.orientationOut_[1] = out.y;
+    this.orientationOut_[2] = out.z;
+    this.orientationOut_[3] = out.w;
+    return this.orientationOut_;
+  } else {
+    // Convert from filter space to the the same system used by the
+    // deviceorientation event.
+    let filterOrientation = this.filter.getOrientation();
+
+    // Predict orientation.
+    orientation = this.posePredictor.getPrediction(filterOrientation,
+                                                   this.gyroscope,
+                                                   this.previousTimestampS);
+  }
 
   // Convert to THREE coordinate system: -Z forward, Y up, X right.
   var out = new MathUtil.Quaternion();
   out.copy(this.filterToWorldQ);
   out.multiply(this.resetQ);
-  out.multiply(this.predictedQ);
+  out.multiply(orientation);
   out.multiply(this.worldToScreenQ);
 
   // Handle the yaw-only case.
@@ -120,6 +161,15 @@ FusionPoseSensor.prototype.resetPose = function() {
 
   // Take into account original pose.
   this.resetQ.multiply(this.originalPoseAdjustQ);
+};
+
+FusionPoseSensor.prototype.onDeviceOrientation_ = function(e) {
+  this._deviceOrientationQ = this._deviceOrientationQ || new MathUtil.Quaternion();
+  let { alpha, beta, gamma } = e;
+  alpha = (alpha || 0) * Math.PI / 180;
+  beta = (beta || 0) * Math.PI / 180;
+  gamma = (gamma || 0) * Math.PI / 180;
+  this._deviceOrientationQ.setFromEulerYXZ(beta, alpha, -gamma);
 };
 
 FusionPoseSensor.prototype.onDeviceMotion_ = function(deviceMotion) {
@@ -157,9 +207,10 @@ FusionPoseSensor.prototype.updateDeviceMotion_ = function(deviceMotion) {
     this.gyroscope.set(rotRate.alpha, rotRate.beta, rotRate.gamma);
   }
 
-  // Browsers on iOS, Firefox/Android, and Chrome m66/Android `rotationRate`
-  // is reported in degrees, so we first convert to radians.
-  if (this.isIOS || this.isFirefoxAndroid || this.isChromeUsingDegrees) {
+  // DeviceMotionEvents should report `rotationRate` in degrees, so we need
+  // to convert to radians. However, some browsers (Android Chrome < m66) report
+  // the rotation as radians, in which case no conversion is needed.
+  if (!this.isDeviceMotionInRadians) {
     this.gyroscope.multiplyScalar(Math.PI / 180);
   }
 
@@ -218,6 +269,7 @@ FusionPoseSensor.prototype.start = function() {
   this.onDeviceMotionCallback_ = this.onDeviceMotion_.bind(this);
   this.onOrientationChangeCallback_ = this.onOrientationChange_.bind(this);
   this.onMessageCallback_ = this.onMessage_.bind(this);
+  this.onDeviceOrientationCallback_ = this.onDeviceOrientation_.bind(this);
 
   // Only listen for postMessages if we're in an iOS and embedded inside a cross
   // origin IFrame. In this case, the polyfill can still work if the containing
@@ -227,11 +279,16 @@ FusionPoseSensor.prototype.start = function() {
     window.addEventListener('message', this.onMessageCallback_);
   }
   window.addEventListener('orientationchange', this.onOrientationChangeCallback_);
-  window.addEventListener('devicemotion', this.onDeviceMotionCallback_);
+  if (this.isWithoutDeviceMotion) {
+    window.addEventListener('deviceorientation', this.onDeviceOrientationCallback_);
+  } else {
+    window.addEventListener('devicemotion', this.onDeviceMotionCallback_);
+  }
 };
 
 FusionPoseSensor.prototype.stop = function() {
   window.removeEventListener('devicemotion', this.onDeviceMotionCallback_);
+  window.removeEventListener('deviceorientation', this.onDeviceOrientationCallback_);
   window.removeEventListener('orientationchange', this.onOrientationChangeCallback_);
   window.removeEventListener('message', this.onMessageCallback_);
 };

@@ -71,6 +71,27 @@ export const getChromeVersion = (function() {
   };
 })();
 
+/**
+ * In Chrome m65, `devicemotion` events are broken but subsequently fixed
+ * in 65.0.3325.148. Since many browsers use Chromium, ensure that
+ * we scope this detection by branch and build numbers to provide
+ * a proper fallback.
+ * https://github.com/immersive-web/webvr-polyfill/issues/307
+ */
+export const isChromeWithoutDeviceMotion = (function() {
+  let value = false;
+  if (getChromeVersion() === 65) {
+    const match = navigator.userAgent.match(/.*Chrome\/([0-9\.]*)/);
+    if (match) {
+      const [major, minor, branch, build] = match[1].split('.');
+      value = parseInt(branch, 10) === 3325 && parseInt(build, 10) < 148;
+    }
+  }
+  return function() {
+    return value;
+  };
+})();
+
 export const isR7 = (function() {
   var isR7 = navigator.userAgent.indexOf('R7 Build') !== -1;
   return function() {
