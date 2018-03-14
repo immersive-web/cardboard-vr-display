@@ -86,6 +86,211 @@
 	(global.CardboardVRDisplay = factory());
 }(this, (function () { 'use strict';
 
+var asyncGenerator = function () {
+  function AwaitValue(value) {
+    this.value = value;
+  }
+
+  function AsyncGenerator(gen) {
+    var front, back;
+
+    function send(key, arg) {
+      return new Promise(function (resolve, reject) {
+        var request = {
+          key: key,
+          arg: arg,
+          resolve: resolve,
+          reject: reject,
+          next: null
+        };
+
+        if (back) {
+          back = back.next = request;
+        } else {
+          front = back = request;
+          resume(key, arg);
+        }
+      });
+    }
+
+    function resume(key, arg) {
+      try {
+        var result = gen[key](arg);
+        var value = result.value;
+
+        if (value instanceof AwaitValue) {
+          Promise.resolve(value.value).then(function (arg) {
+            resume("next", arg);
+          }, function (arg) {
+            resume("throw", arg);
+          });
+        } else {
+          settle(result.done ? "return" : "normal", result.value);
+        }
+      } catch (err) {
+        settle("throw", err);
+      }
+    }
+
+    function settle(type, value) {
+      switch (type) {
+        case "return":
+          front.resolve({
+            value: value,
+            done: true
+          });
+          break;
+
+        case "throw":
+          front.reject(value);
+          break;
+
+        default:
+          front.resolve({
+            value: value,
+            done: false
+          });
+          break;
+      }
+
+      front = front.next;
+
+      if (front) {
+        resume(front.key, front.arg);
+      } else {
+        back = null;
+      }
+    }
+
+    this._invoke = send;
+
+    if (typeof gen.return !== "function") {
+      this.return = undefined;
+    }
+  }
+
+  if (typeof Symbol === "function" && Symbol.asyncIterator) {
+    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
+      return this;
+    };
+  }
+
+  AsyncGenerator.prototype.next = function (arg) {
+    return this._invoke("next", arg);
+  };
+
+  AsyncGenerator.prototype.throw = function (arg) {
+    return this._invoke("throw", arg);
+  };
+
+  AsyncGenerator.prototype.return = function (arg) {
+    return this._invoke("return", arg);
+  };
+
+  return {
+    wrap: function (fn) {
+      return function () {
+        return new AsyncGenerator(fn.apply(this, arguments));
+      };
+    },
+    await: function (value) {
+      return new AwaitValue(value);
+    }
+  };
+}();
+
+
+
+
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var slicedToArray = function () {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"]) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  return function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+}();
+
 var MIN_TIMESTEP = 0.001;
 var MAX_TIMESTEP = 1;
 var base64 = function base64(mimeType, _base) {
@@ -117,6 +322,31 @@ var isFirefoxAndroid = function () {
   var isFirefoxAndroid = navigator.userAgent.indexOf('Firefox') !== -1 && navigator.userAgent.indexOf('Android') !== -1;
   return function () {
     return isFirefoxAndroid;
+  };
+}();
+var getChromeVersion = function () {
+  var match = navigator.userAgent.match(/.*Chrome\/([0-9]+)/);
+  var value = match ? parseInt(match[1], 10) : null;
+  return function () {
+    return value;
+  };
+}();
+var isChromeWithoutDeviceMotion = function () {
+  var value = false;
+  if (getChromeVersion() === 65) {
+    var match = navigator.userAgent.match(/.*Chrome\/([0-9\.]*)/);
+    if (match) {
+      var _match$1$split = match[1].split('.'),
+          _match$1$split2 = slicedToArray(_match$1$split, 4),
+          major = _match$1$split2[0],
+          minor = _match$1$split2[1],
+          branch = _match$1$split2[2],
+          build = _match$1$split2[3];
+      value = parseInt(branch, 10) === 3325 && parseInt(build, 10) < 148;
+    }
+  }
+  return function () {
+    return value;
   };
 }();
 var isR7 = function () {
@@ -1915,7 +2145,6 @@ function FusionPoseSensor(kFilter, predictionTime, yawOnly, isDebug) {
   this.yawOnly = yawOnly;
   this.accelerometer = new Vector3();
   this.gyroscope = new Vector3();
-  this.start();
   this.filter = new ComplementaryFilter(kFilter, isDebug);
   this.posePredictor = new PosePredictor(predictionTime, isDebug);
   this.filterToWorldQ = new Quaternion();
@@ -1935,18 +2164,48 @@ function FusionPoseSensor(kFilter, predictionTime, yawOnly, isDebug) {
   this.resetQ = new Quaternion();
   this.isFirefoxAndroid = isFirefoxAndroid();
   this.isIOS = isIOS();
+  var chromeVersion = getChromeVersion();
+  this.isDeviceMotionInRadians = !this.isIOS && chromeVersion && chromeVersion < 66;
+  this.isWithoutDeviceMotion = isChromeWithoutDeviceMotion();
   this.orientationOut_ = new Float32Array(4);
+  this.start();
 }
 FusionPoseSensor.prototype.getPosition = function () {
   return null;
 };
 FusionPoseSensor.prototype.getOrientation = function () {
-  var orientation = this.filter.getOrientation();
-  this.predictedQ = this.posePredictor.getPrediction(orientation, this.gyroscope, this.previousTimestampS);
+  var orientation = void 0;
+  if (this.isWithoutDeviceMotion && this._deviceOrientationQ) {
+    this.deviceOrientationFixQ = this.deviceOrientationFixQ || function () {
+      var z = new Quaternion().setFromAxisAngle(new Vector3(0, 0, -1), 0);
+      var y = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), Math.PI / 2);
+      return z.multiply(y);
+    }();
+    orientation = this._deviceOrientationQ;
+    var out = new Quaternion();
+    out.copy(orientation);
+    out.multiply(this.filterToWorldQ);
+    out.multiply(this.resetQ);
+    out.multiply(this.worldToScreenQ);
+    out.multiplyQuaternions(this.deviceOrientationFixQ, out);
+    if (this.yawOnly) {
+      out.x = 0;
+      out.z = 0;
+      out.normalize();
+    }
+    this.orientationOut_[0] = out.x;
+    this.orientationOut_[1] = out.y;
+    this.orientationOut_[2] = out.z;
+    this.orientationOut_[3] = out.w;
+    return this.orientationOut_;
+  } else {
+    var filterOrientation = this.filter.getOrientation();
+    orientation = this.posePredictor.getPrediction(filterOrientation, this.gyroscope, this.previousTimestampS);
+  }
   var out = new Quaternion();
   out.copy(this.filterToWorldQ);
   out.multiply(this.resetQ);
-  out.multiply(this.predictedQ);
+  out.multiply(orientation);
   out.multiply(this.worldToScreenQ);
   if (this.yawOnly) {
     out.x = 0;
@@ -1969,6 +2228,16 @@ FusionPoseSensor.prototype.resetPose = function () {
     this.resetQ.multiply(this.inverseWorldToScreenQ);
   }
   this.resetQ.multiply(this.originalPoseAdjustQ);
+};
+FusionPoseSensor.prototype.onDeviceOrientation_ = function (e) {
+  this._deviceOrientationQ = this._deviceOrientationQ || new Quaternion();
+  var alpha = e.alpha,
+      beta = e.beta,
+      gamma = e.gamma;
+  alpha = (alpha || 0) * Math.PI / 180;
+  beta = (beta || 0) * Math.PI / 180;
+  gamma = (gamma || 0) * Math.PI / 180;
+  this._deviceOrientationQ.setFromEulerYXZ(beta, alpha, -gamma);
 };
 FusionPoseSensor.prototype.onDeviceMotion_ = function (deviceMotion) {
   this.updateDeviceMotion_(deviceMotion);
@@ -1993,7 +2262,7 @@ FusionPoseSensor.prototype.updateDeviceMotion_ = function (deviceMotion) {
   } else {
     this.gyroscope.set(rotRate.alpha, rotRate.beta, rotRate.gamma);
   }
-  if (this.isIOS || this.isFirefoxAndroid) {
+  if (!this.isDeviceMotionInRadians) {
     this.gyroscope.multiplyScalar(Math.PI / 180);
   }
   this.filter.addAccelMeasurement(this.accelerometer, timestampS);
@@ -2035,158 +2304,23 @@ FusionPoseSensor.prototype.start = function () {
   this.onDeviceMotionCallback_ = this.onDeviceMotion_.bind(this);
   this.onOrientationChangeCallback_ = this.onOrientationChange_.bind(this);
   this.onMessageCallback_ = this.onMessage_.bind(this);
+  this.onDeviceOrientationCallback_ = this.onDeviceOrientation_.bind(this);
   if (isIOS() && isInsideCrossOriginIFrame()) {
     window.addEventListener('message', this.onMessageCallback_);
   }
   window.addEventListener('orientationchange', this.onOrientationChangeCallback_);
-  window.addEventListener('devicemotion', this.onDeviceMotionCallback_);
+  if (this.isWithoutDeviceMotion) {
+    window.addEventListener('deviceorientation', this.onDeviceOrientationCallback_);
+  } else {
+    window.addEventListener('devicemotion', this.onDeviceMotionCallback_);
+  }
 };
 FusionPoseSensor.prototype.stop = function () {
   window.removeEventListener('devicemotion', this.onDeviceMotionCallback_);
+  window.removeEventListener('deviceorientation', this.onDeviceOrientationCallback_);
   window.removeEventListener('orientationchange', this.onOrientationChangeCallback_);
   window.removeEventListener('message', this.onMessageCallback_);
 };
-
-var asyncGenerator = function () {
-  function AwaitValue(value) {
-    this.value = value;
-  }
-
-  function AsyncGenerator(gen) {
-    var front, back;
-
-    function send(key, arg) {
-      return new Promise(function (resolve, reject) {
-        var request = {
-          key: key,
-          arg: arg,
-          resolve: resolve,
-          reject: reject,
-          next: null
-        };
-
-        if (back) {
-          back = back.next = request;
-        } else {
-          front = back = request;
-          resume(key, arg);
-        }
-      });
-    }
-
-    function resume(key, arg) {
-      try {
-        var result = gen[key](arg);
-        var value = result.value;
-
-        if (value instanceof AwaitValue) {
-          Promise.resolve(value.value).then(function (arg) {
-            resume("next", arg);
-          }, function (arg) {
-            resume("throw", arg);
-          });
-        } else {
-          settle(result.done ? "return" : "normal", result.value);
-        }
-      } catch (err) {
-        settle("throw", err);
-      }
-    }
-
-    function settle(type, value) {
-      switch (type) {
-        case "return":
-          front.resolve({
-            value: value,
-            done: true
-          });
-          break;
-
-        case "throw":
-          front.reject(value);
-          break;
-
-        default:
-          front.resolve({
-            value: value,
-            done: false
-          });
-          break;
-      }
-
-      front = front.next;
-
-      if (front) {
-        resume(front.key, front.arg);
-      } else {
-        back = null;
-      }
-    }
-
-    this._invoke = send;
-
-    if (typeof gen.return !== "function") {
-      this.return = undefined;
-    }
-  }
-
-  if (typeof Symbol === "function" && Symbol.asyncIterator) {
-    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-      return this;
-    };
-  }
-
-  AsyncGenerator.prototype.next = function (arg) {
-    return this._invoke("next", arg);
-  };
-
-  AsyncGenerator.prototype.throw = function (arg) {
-    return this._invoke("throw", arg);
-  };
-
-  AsyncGenerator.prototype.return = function (arg) {
-    return this._invoke("return", arg);
-  };
-
-  return {
-    wrap: function (fn) {
-      return function () {
-        return new AsyncGenerator(fn.apply(this, arguments));
-      };
-    },
-    await: function (value) {
-      return new AwaitValue(value);
-    }
-  };
-}();
-
-
-
-
-
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
 
 var SENSOR_FREQUENCY = 60;
 var X_AXIS = new Vector3(1, 0, 0);
