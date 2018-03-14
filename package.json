@@ -28,6 +28,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "rollup -c",
+    "watch": "rollup -c -w",
     "preversion": "npm test",
     "version": "npm run build && git add dist/*",
     "postversion": "git push && git push --tags && npm publish"

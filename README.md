@@ -156,6 +156,7 @@ frame.pose; // { orientation, position }
 
 * `npm install`: installs the dependencies.
 * `npm run build`: builds the distributable.
+* `npm run watch`: watches `src/` for changes and rebuilds on change.
 
 ## Running The Demo
 
