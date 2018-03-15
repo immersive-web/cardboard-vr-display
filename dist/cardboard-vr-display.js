@@ -2739,7 +2739,13 @@ var defaultLeftBounds = [0, 0, 0.5, 1];
 var defaultRightBounds = [0.5, 0, 0.5, 1];
 var raf = window.requestAnimationFrame;
 var caf = window.cancelAnimationFrame;
-
+function VRFrameData() {
+  this.leftProjectionMatrix = new Float32Array(16);
+  this.leftViewMatrix = new Float32Array(16);
+  this.rightProjectionMatrix = new Float32Array(16);
+  this.rightViewMatrix = new Float32Array(16);
+  this.pose = null;
+}
 function VRDisplayCapabilities(config) {
   Object.defineProperties(this, {
     hasPosition: {
@@ -3319,6 +3325,8 @@ CardboardVRDisplay.prototype.fireVRDisplayDeviceParamsChange_ = function () {
   });
   window.dispatchEvent(event);
 };
+CardboardVRDisplay.VRFrameData = VRFrameData;
+CardboardVRDisplay.VRDisplay = VRDisplay;
 
 return CardboardVRDisplay;
 
