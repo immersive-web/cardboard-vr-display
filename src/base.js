@@ -14,7 +14,7 @@
  */
 
 import * as Util from './util.js';
-import NoSleep from 'nosleep.js';
+import NoSleep from 'nosleep.js/dist/NoSleep.js';
 
 // Start at a higher number to reduce chance of conflict.
 var nextDisplayId = 1000;
