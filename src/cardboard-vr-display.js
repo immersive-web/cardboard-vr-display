@@ -20,7 +20,7 @@ import Dpdb from './dpdb.js';
 import PoseSensor from './pose-sensor.js';
 import RotateInstructions from './rotate-instructions.js';
 import ViewerSelector from './viewer-selector.js';
-import { VRDisplay, VRDisplayCapabilities } from './base.js';
+import { VRFrameData, VRDisplay, VRDisplayCapabilities } from './base.js';
 import * as Util from './util.js';
 import Options from './options.js';
 
@@ -344,5 +344,8 @@ CardboardVRDisplay.prototype.fireVRDisplayDeviceParamsChange_ = function() {
   });
   window.dispatchEvent(event);
 };
+
+CardboardVRDisplay.VRFrameData = VRFrameData;
+CardboardVRDisplay.VRDisplay = VRDisplay;
 
 export default CardboardVRDisplay;
