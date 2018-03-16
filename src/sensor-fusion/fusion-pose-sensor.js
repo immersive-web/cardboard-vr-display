@@ -34,6 +34,18 @@ function FusionPoseSensor(kFilter, predictionTime, yawOnly, isDebug) {
   this.filter = new ComplementaryFilter(kFilter, isDebug);
   this.posePredictor = new PosePredictor(predictionTime, isDebug);
 
+  this.isFirefoxAndroid = Util.isFirefoxAndroid();
+  this.isIOS = Util.isIOS();
+  // Chrome as of m66 started reporting `rotationRate` in degrees rather
+  // than radians, to be consistent with other browsers.
+  // https://github.com/immersive-web/cardboard-vr-display/issues/18
+  let chromeVersion = Util.getChromeVersion();
+  this.isDeviceMotionInRadians = !this.isIOS && chromeVersion && chromeVersion < 66;
+  // In Chrome m65 there's a regression of devicemotion events. Fallback
+  // to using deviceorientation for these specific builds. More information
+  // at `Util.isChromeWithoutDeviceMotion`.
+  this.isWithoutDeviceMotion = Util.isChromeWithoutDeviceMotion();
+
   this.filterToWorldQ = new MathUtil.Quaternion();
 
   // Set the filter to world transform, depending on OS.
@@ -58,18 +70,6 @@ function FusionPoseSensor(kFilter, predictionTime, yawOnly, isDebug) {
   // Keep track of a reset transform for resetSensor.
   this.resetQ = new MathUtil.Quaternion();
 
-  this.isFirefoxAndroid = Util.isFirefoxAndroid();
-  this.isIOS = Util.isIOS();
-  // Chrome as of m66 started reporting `rotationRate` in degrees rather
-  // than radians, to be consistent with other browsers.
-  // https://github.com/immersive-web/cardboard-vr-display/issues/18
-  let chromeVersion = Util.getChromeVersion();
-  this.isDeviceMotionInRadians = !this.isIOS && chromeVersion && chromeVersion < 66;
-  // In Chrome m65 there's a regression of devicemotion events. Fallback
-  // to using deviceorientation for these specific builds. More information
-  // at `Util.isChromeWithoutDeviceMotion`.
-  this.isWithoutDeviceMotion = Util.isChromeWithoutDeviceMotion();
-
   this.orientationOut_ = new Float32Array(4);
 
   this.start();
@@ -85,17 +85,31 @@ FusionPoseSensor.prototype.getOrientation = function() {
 
   // Hack around using deviceorientation instead of devicemotion
   if (this.isWithoutDeviceMotion && this._deviceOrientationQ) {
-    // We must rotate 90 degrees on the Y axis to get the correct
-    // orientation of looking down the -Z axis.
+    // We must rotate 90 (or -90, based on initial rotation) degrees
+    // on the Y axis to get the correct orientation of looking down the -Z axis.
     this.deviceOrientationFixQ = this.deviceOrientationFixQ || (function () {
       const z = new MathUtil.Quaternion().setFromAxisAngle(new MathUtil.Vector3(0, 0, -1), 0);
-      const y = new MathUtil.Quaternion().setFromAxisAngle(new MathUtil.Vector3(0, 1, 0), Math.PI / 2);
+      const y = new MathUtil.Quaternion()
+
+      if (window.orientation === -90) {
+        y.setFromAxisAngle(new MathUtil.Vector3(0, 1, 0), Math.PI / -2);
+      } else {
+        y.setFromAxisAngle(new MathUtil.Vector3(0, 1, 0), Math.PI / 2);
+      }
+
       return z.multiply(y);
     })();
+
+    this.deviceOrientationFilterToWorldQ = this.deviceOrientationFilterToWorldQ || (function () {
+      const q = new MathUtil.Quaternion();
+      q.setFromAxisAngle(new MathUtil.Vector3(1, 0, 0), -Math.PI / 2);
+      return q;
+    })();
+
     orientation = this._deviceOrientationQ;
     var out = new MathUtil.Quaternion();
     out.copy(orientation);
-    out.multiply(this.filterToWorldQ);
+    out.multiply(this.deviceOrientationFilterToWorldQ);
     out.multiply(this.resetQ);
     out.multiply(this.worldToScreenQ);
     out.multiplyQuaternions(this.deviceOrientationFixQ, out);
