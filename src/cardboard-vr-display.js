@@ -118,9 +118,9 @@ CardboardVRDisplay.prototype._getEyeOffset = function(whichEye) {
   var offset;
 
   if (whichEye == Eye.LEFT) {
-    offset = [this.deviceInfo_.viewer.interLensDistance * 0.5, 0.0, 0.0];
-  } else if (whichEye == Eye.RIGHT) {
     offset = [-this.deviceInfo_.viewer.interLensDistance * 0.5, 0.0, 0.0];
+  } else if (whichEye == Eye.RIGHT) {
+    offset = [this.deviceInfo_.viewer.interLensDistance * 0.5, 0.0, 0.0];
   } else {
     console.error('Invalid eye provided: %s', whichEye);
     return null;
