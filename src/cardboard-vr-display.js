@@ -18,7 +18,7 @@ import CardboardUI from './cardboard-ui.js';
 import DeviceInfo from './device-info.js';
 import Dpdb from './dpdb.js';
 import PoseSensor from './pose-sensor.js';
-import RotateInstructions from './rotate-instructions.js';
+//import RotateInstructions from './rotate-instructions.js';
 import ViewerSelector from './viewer-selector.js';
 import { VRFrameData, VRDisplay, VRDisplayCapabilities } from './base.js';
 import * as Util from './util.js';
@@ -69,9 +69,10 @@ function CardboardVRDisplay(config) {
   // Set the correct initial viewer.
   this.deviceInfo_.setViewer(this.viewerSelector_.getCurrentViewer());
 
+/*
   if (!this.config.ROTATE_INSTRUCTIONS_DISABLED) {
     this.rotateInstructions_ = new RotateInstructions();
-  }
+  }*/
 
   if (Util.isIOS()) {
     // Listen for resize events to workaround this awful Safari bug.
@@ -140,14 +141,14 @@ CardboardVRDisplay.prototype.getEyeParameters = function(whichEye) {
     renderHeight: this.deviceInfo_.device.height * this.bufferScale_,
   };
 
-  Object.defineProperty(eyeParams, 'fieldOfView', {
+  /*Object.defineProperty(eyeParams, 'fieldOfView', {
     enumerable: true,
     get: function() {
       Util.deprecateWarning('VRFieldOfView',
                             'VRFrameData\'s projection matrices');
       return fieldOfView;
     },
-  });
+  });*/
 
   return eyeParams;
 };
@@ -211,7 +212,7 @@ CardboardVRDisplay.prototype.beginPresent_ = function() {
     }.bind(this));
   }
 
-  if (this.rotateInstructions_) {
+ /* if (this.rotateInstructions_) {
     if (Util.isLandscapeMode() && Util.isMobile()) {
       // In landscape mode, temporarily show the "put into Cardboard"
       // interstitial. Otherwise, do the default thing.
@@ -220,7 +221,7 @@ CardboardVRDisplay.prototype.beginPresent_ = function() {
       this.rotateInstructions_.update();
     }
   }
-
+*/
   // Listen for orientation change events in order to show interstitial.
   this.orientationHandler = this.onOrientationChange_.bind(this);
   window.addEventListener('orientationchange', this.orientationHandler);
@@ -243,10 +244,10 @@ CardboardVRDisplay.prototype.endPresent_ = function() {
     this.cardboardUI_.destroy();
     this.cardboardUI_ = null;
   }
-
+/*
   if (this.rotateInstructions_) {
     this.rotateInstructions_.hide();
-  }
+  }*/
   this.viewerSelector_.hide();
 
   window.removeEventListener('orientationchange', this.orientationHandler);
@@ -285,9 +286,9 @@ CardboardVRDisplay.prototype.onOrientationChange_ = function(e) {
   this.viewerSelector_.hide();
 
   // Update the rotate instructions.
-  if (this.rotateInstructions_) {
+  /*if (this.rotateInstructions_) {
     this.rotateInstructions_.update();
-  }
+  }*/
 
   this.onResize_();
 };
