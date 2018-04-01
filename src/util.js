@@ -505,9 +505,10 @@ export const warnOnce = (function() {
   };
 })();
 
+/*
 export const deprecateWarning = function(deprecated, suggested) {
   var alternative = suggested ? ('Please use ' + suggested + ' instead.') : '';
   warnOnce(deprecated, deprecated + ' has been deprecated. ' +
            'This may not work on native WebVR displays. ' +
            alternative);
-};
+};*/

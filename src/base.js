@@ -50,14 +50,14 @@ export function VRDisplayCapabilities (config) {
     },
     maxLayers: {
       writable: false, enumerable: true, value: config.maxLayers,
-    },
+    }/*,
     hasOrientation: {
       enumerable: true, get: function() {
-        Util.deprecateWarning('VRDisplayCapabilities.prototype.hasOrientation',
-                              'VRDisplay.prototype.getFrameData');
+       // Util.deprecateWarning('VRDisplayCapabilities.prototype.hasOrientation',
+                       //       'VRDisplay.prototype.getFrameData');
         return config.hasOrientation;
       },
-    },
+    },*/
   });
 }
 
@@ -77,13 +77,13 @@ export function VRDisplay(config) {
 
   this.isPresenting = false;
 
-  Object.defineProperty(this, 'isConnected', {
+  /*Object.defineProperty(this, 'isConnected', {
     get: function() {
       Util.deprecateWarning('VRDisplay.prototype.isConnected',
                             'VRDisplayCapabilities.prototype.hasExternalDisplay');
       return false;
     },
-  });
+  });*/
 
   this.capabilities = new VRDisplayCapabilities({
     hasPosition: false,
@@ -127,7 +127,7 @@ VRDisplay.prototype.getFrameData = function(frameData) {
   return Util.frameDataFromPose(frameData, this._getPose(), this);
 };
 
-VRDisplay.prototype.getPose = function() {
+/*VRDisplay.prototype.getPose = function() {
   // TODO: Technically this should retain it's value for the duration of a frame
   // but I doubt that's practical to do in javascript.
   Util.deprecateWarning('VRDisplay.prototype.getPose',
@@ -146,7 +146,7 @@ VRDisplay.prototype.getImmediatePose = function() {
   Util.deprecateWarning('VRDisplay.prototype.getImmediatePose',
                         'VRDisplay.prototype.getFrameData');
   return this._getPose();
-};
+};*/
 
 VRDisplay.prototype.requestAnimationFrame = function(callback) {
   return raf(callback);
@@ -276,11 +276,11 @@ VRDisplay.prototype.requestPresent = function(layers) {
   var wasPresenting = this.isPresenting;
   var self = this;
 
-  if (!(layers instanceof Array)) {
+  /*if (!(layers instanceof Array)) {
     Util.deprecateWarning('VRDisplay.prototype.requestPresent with non-array argument',
                           'an array of VRLayers as the first argument');
     layers = [layers];
-  }
+  }*/
 
   return new Promise(function(resolve, reject) {
     if (!self.capabilities.canPresent) {
@@ -288,10 +288,10 @@ VRDisplay.prototype.requestPresent = function(layers) {
       return;
     }
 
-    if (layers.length == 0 || layers.length > self.capabilities.maxLayers) {
+    /*if (layers.length == 0 || layers.length > self.capabilities.maxLayers) {
       reject(new Error('Invalid number of layers.'));
       return;
-    }
+    }*/
 
     var incomingLayer = layers[0];
     if (!incomingLayer.source) {
@@ -344,7 +344,7 @@ VRDisplay.prototype.requestPresent = function(layers) {
         if (self.isPresenting) {
           if (screen.orientation && screen.orientation.lock) {
             screen.orientation.lock('landscape-primary').catch(function(error){
-                    console.error('screen.orientation.lock() failed due to', error.message)
+                   // console.error('screen.orientation.lock() failed due to', error.message)
             });
           }
           self.waitingForPresent_ = false;
@@ -459,7 +459,7 @@ VRDisplay.prototype.addFullscreenListeners_ = function(element, changeHandler, e
 
   if (changeHandler) {
     if (document.fullscreenEnabled) {
-      element.addEventListener('fullscreenchange', changeHandler, false);
+      document.addEventListener('fullscreenchange', changeHandler, false);
     } else if (document.webkitFullscreenEnabled) {
       element.addEventListener('webkitfullscreenchange', changeHandler, false);
     } else if (document.mozFullScreenEnabled) {
@@ -471,7 +471,7 @@ VRDisplay.prototype.addFullscreenListeners_ = function(element, changeHandler, e
 
   if (errorHandler) {
     if (document.fullscreenEnabled) {
-      element.addEventListener('fullscreenerror', errorHandler, false);
+      document.addEventListener('fullscreenerror', errorHandler, false);
     } else if (document.webkitFullscreenEnabled) {
       element.addEventListener('webkitfullscreenerror', errorHandler, false);
     } else if (document.mozFullScreenEnabled) {
@@ -490,7 +490,7 @@ VRDisplay.prototype.removeFullscreenListeners_ = function() {
 
   if (this.fullscreenChangeHandler_) {
     var changeHandler = this.fullscreenChangeHandler_;
-    element.removeEventListener('fullscreenchange', changeHandler, false);
+    document.removeEventListener('fullscreenchange', changeHandler, false);
     element.removeEventListener('webkitfullscreenchange', changeHandler, false);
     document.removeEventListener('mozfullscreenchange', changeHandler, false);
     element.removeEventListener('msfullscreenchange', changeHandler, false);
@@ -498,7 +498,7 @@ VRDisplay.prototype.removeFullscreenListeners_ = function() {
 
   if (this.fullscreenErrorHandler_) {
     var errorHandler = this.fullscreenErrorHandler_;
-    element.removeEventListener('fullscreenerror', errorHandler, false);
+    document.removeEventListener('fullscreenerror', errorHandler, false);
     element.removeEventListener('webkitfullscreenerror', errorHandler, false);
     document.removeEventListener('mozfullscreenerror', errorHandler, false);
     element.removeEventListener('msfullscreenerror', errorHandler, false);
