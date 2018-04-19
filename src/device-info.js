@@ -81,10 +81,14 @@ var DEFAULT_RIGHT_CENTER = {x: 0.5, y: 0.5};
  * obtained from dpdb.getDeviceParams()). Can be null to mean no device
  * params were found.
  */
-function DeviceInfo(deviceParams) {
+function DeviceInfo(deviceParams, additionalViewers) {
   this.viewer = Viewers.CardboardV2;
   this.updateDeviceParams(deviceParams);
   this.distortion = new Distortion(this.viewer.distortionCoefficients);
+  for (var i = 0; i < additionalViewers.length; i++) {
+    var viewer = additionalViewers[i];
+    Viewers[viewer.id] = new CardboardViewer(viewer);
+  }
 }
 
 DeviceInfo.prototype.updateDeviceParams = function(deviceParams) {
