@@ -61,9 +61,10 @@ function CardboardVRDisplay(config) {
   this.cardboardUI_ = null;
 
   this.dpdb_ = new Dpdb(this.config.DPDB_URL, this.onDeviceParamsUpdated_.bind(this));
-  this.deviceInfo_ = new DeviceInfo(this.dpdb_.getDeviceParams());
+  this.deviceInfo_ = new DeviceInfo(this.dpdb_.getDeviceParams(),
+                                    config.ADDITIONAL_VIEWERS);
 
-  this.viewerSelector_ = new ViewerSelector();
+  this.viewerSelector_ = new ViewerSelector(config.DEFAULT_VIEWER);
   this.viewerSelector_.onChange(this.onViewerChanged_.bind(this));
 
   // Set the correct initial viewer.

@@ -25,7 +25,7 @@ const CLASS_NAME = 'webvr-polyfill-viewer-selector';
  * and hidden. Generates events when viewer parameters change. Also supports
  * saving the currently selected index in localStorage.
  */
-function ViewerSelector() {
+function ViewerSelector(defaultViewer) {
   // Try to load the selected key from local storage.
   try {
     this.selectedKey = localStorage.getItem(VIEWER_KEY);
@@ -35,7 +35,7 @@ function ViewerSelector() {
 
   //If none exists, or if localstorage is unavailable, use the default key.
   if (!this.selectedKey) {
-    this.selectedKey = DEFAULT_VIEWER;
+    this.selectedKey = defaultViewer || DEFAULT_VIEWER;
   }
 
   this.dialog = this.createDialog_(DeviceInfo.Viewers);
