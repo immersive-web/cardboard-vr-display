@@ -14,6 +14,30 @@
  */
 
 const config = {
+
+  // Optionally inject custom Viewer parameters as an option. Each item
+  // in the array must be an object with the following properties; here is
+  // an example of the built in CardboardV2 viewer:
+  //
+  // {
+  //   id: 'CardboardV2',
+  //   label: 'Cardboard I/O 2015',
+  //   fov: 60,
+  //   interLensDistance: 0.064,
+  //   baselineLensDistance: 0.035,
+  //   screenLensDistance: 0.039,
+  //   distortionCoefficients: [0.34, 0.55],
+  //   inverseCoefficients: [-0.33836704, -0.18162185, 0.862655, -1.2462051,
+  //     1.0560602, -0.58208317, 0.21609078, -0.05444823, 0.009177956,
+  //     -9.904169E-4, 6.183535E-5, -1.6981803E-6]
+  // }
+  // Added in 1.0.12.
+  ADDITIONAL_VIEWERS: [],
+
+  // Select the viewer by ID. If unspecified, defaults to 'CardboardV1'.
+  // Added in 1.0.12.
+  DEFAULT_VIEWER: '',
+
   // By default, on mobile, a wakelock is necessary to prevent the device's screen
   // from turning off without user input. Disable if you're keeping the screen awake through
   // other means on mobile. A wakelock is never used on desktop.
