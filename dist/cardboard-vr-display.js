@@ -1703,10 +1703,14 @@ var Viewers = {
     inverseCoefficients: [-0.33836704, -0.18162185, 0.862655, -1.2462051, 1.0560602, -0.58208317, 0.21609078, -0.05444823, 0.009177956, -9.904169E-4, 6.183535E-5, -1.6981803E-6]
   })
 };
-function DeviceInfo(deviceParams) {
+function DeviceInfo(deviceParams, additionalViewers) {
   this.viewer = Viewers.CardboardV2;
   this.updateDeviceParams(deviceParams);
   this.distortion = new Distortion(this.viewer.distortionCoefficients);
+  for (var i = 0; i < additionalViewers.length; i++) {
+    var viewer = additionalViewers[i];
+    Viewers[viewer.id] = new CardboardViewer(viewer);
+  }
 }
 DeviceInfo.prototype.updateDeviceParams = function (deviceParams) {
   this.device = this.determineDevice_(deviceParams) || this.device;
@@ -2560,14 +2564,14 @@ RotateInstructions.prototype.loadIcon_ = function () {
 var DEFAULT_VIEWER = 'CardboardV1';
 var VIEWER_KEY = 'WEBVR_CARDBOARD_VIEWER';
 var CLASS_NAME = 'webvr-polyfill-viewer-selector';
-function ViewerSelector() {
+function ViewerSelector(defaultViewer) {
   try {
     this.selectedKey = localStorage.getItem(VIEWER_KEY);
   } catch (error) {
     console.error('Failed to load viewer profile: %s', error);
   }
   if (!this.selectedKey) {
-    this.selectedKey = DEFAULT_VIEWER;
+    this.selectedKey = defaultViewer || DEFAULT_VIEWER;
   }
   this.dialog = this.createDialog_(DeviceInfo.Viewers);
   this.root = null;
@@ -3178,6 +3182,8 @@ VRDisplay.prototype.getEyeParameters = function (whichEye) {
 };
 
 var config = {
+  ADDITIONAL_VIEWERS: [],
+  DEFAULT_VIEWER: '',
   MOBILE_WAKE_LOCK: true,
   DEBUG: false,
   DPDB_URL: 'https://dpdb.webvr.rocks/dpdb.json',
@@ -3215,8 +3221,8 @@ function CardboardVRDisplay(config$$1) {
   this.distorter_ = null;
   this.cardboardUI_ = null;
   this.dpdb_ = new Dpdb(this.config.DPDB_URL, this.onDeviceParamsUpdated_.bind(this));
-  this.deviceInfo_ = new DeviceInfo(this.dpdb_.getDeviceParams());
-  this.viewerSelector_ = new ViewerSelector();
+  this.deviceInfo_ = new DeviceInfo(this.dpdb_.getDeviceParams(), config$$1.ADDITIONAL_VIEWERS);
+  this.viewerSelector_ = new ViewerSelector(config$$1.DEFAULT_VIEWER);
   this.viewerSelector_.onChange(this.onViewerChanged_.bind(this));
   this.deviceInfo_.setViewer(this.viewerSelector_.getCurrentViewer());
   if (!this.config.ROTATE_INSTRUCTIONS_DISABLED) {
