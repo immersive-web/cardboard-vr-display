@@ -124,6 +124,11 @@ export default class PoseSensor {
                                              this.config.PREDICTION_TIME_S,
                                              this.config.YAW_ONLY,
                                              this.config.DEBUG);
+    if (this.sensor) {
+      this.sensor.removeEventListener('reading', this._onSensorRead);
+      this.sensor.removeEventListener('error', this._onSensorError);
+      this.sensor = null;
+    }
   }
 
   getOrientation() {
@@ -169,6 +174,7 @@ export default class PoseSensor {
     } else {
       console.error(event.error);
     }
+    this.useDeviceMotion();
   }
 
   _onSensorRead() {}
