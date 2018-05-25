@@ -2404,6 +2404,11 @@ var PoseSensor = function () {
     value: function useDeviceMotion() {
       this.api = 'devicemotion';
       this.fusionSensor = new FusionPoseSensor(this.config.K_FILTER, this.config.PREDICTION_TIME_S, this.config.YAW_ONLY, this.config.DEBUG);
+      if (this.sensor) {
+        this.sensor.removeEventListener('reading', this._onSensorRead);
+        this.sensor.removeEventListener('error', this._onSensorError);
+        this.sensor = null;
+      }
     }
   }, {
     key: 'getOrientation',
@@ -2443,6 +2448,7 @@ var PoseSensor = function () {
       } else {
         console.error(event.error);
       }
+      this.useDeviceMotion();
     }
   }, {
     key: '_onSensorRead',
