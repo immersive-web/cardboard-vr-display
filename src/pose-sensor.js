@@ -25,9 +25,9 @@ const X_AXIS = new Vector3(1, 0, 0);
 const Z_AXIS = new Vector3(0, 0, 1);
 
 let orientation = {};
-if (screen.orientation) {
+if ((typeof screen !== 'undefined') && screen.orientation) {
   orientation = screen.orientation;
-} else if (screen.msOrientation) {
+} else if ((typeof screen !== 'undefined') && screen.msOrientation) {
   orientation = screen.msOrientation;
 } else {
   Object.defineProperty(orientation, 'angle', {
