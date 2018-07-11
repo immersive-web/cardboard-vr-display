@@ -54,6 +54,7 @@ to fall back to `devicemotion`. Using Feature Policies now will guarantee a more
 * Chrome M63 supports Sensors, although not the corresponding Feature Policy [until Chrome M65][sensors-main-frame].
   This results in Chrome M63/M64 only supporting Sensors in main frames, and these browsers
   will fall back to using devicemotion if in iframes.
+* Using Sensors in a cross-origin iframe [requires the frame to be in focus](https://www.w3.org/TR/generic-sensor/#focused-area). In builds of Chrome prior to M69, this logic is [erroneously reversed](https://bugs.chromium.org/p/chromium/issues/detail?id=849501). If loading content via cross-origin iframe, you can disable Sensors, triggering the `devicemotion` fallback with this [hacky workaround](https://github.com/immersive-web/cardboard-vr-display/blob/c196e15a8c7ccf594fe6a5044fbdcb51cc2eff91/examples/index.html#L117-L124). More info in #27.
 
 ### Magic Window
 
