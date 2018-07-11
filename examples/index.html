@@ -114,6 +114,15 @@ function VRFrameData () {
 console.log('creating CardboardVRDisplay with options', config);
 var vrDisplay = new CardboardVRDisplay(config);
 
+// If loading this inside of an iframe (see iframe.html),
+// force using the `devicemotion` sensor fusion, rather than
+// newer Generic Sensors due to an issue with sensors
+// in iframes in Chrome < m69:
+// https://bugs.chromium.org/p/chromium/issues/detail?id=849501
+if (window.self !== window.top) {
+  vrDisplay.poseSensor_.useDeviceMotion();
+}
+
 navigator.getVRDisplays = function () {
   return new Promise(function (resolve) {
     resolve([vrDisplay]);
