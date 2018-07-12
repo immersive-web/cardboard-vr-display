@@ -24,17 +24,6 @@ const SENSOR_FREQUENCY = 60;
 const X_AXIS = new Vector3(1, 0, 0);
 const Z_AXIS = new Vector3(0, 0, 1);
 
-let orientation = {};
-if (screen.orientation) {
-  orientation = screen.orientation;
-} else if (screen.msOrientation) {
-  orientation = screen.msOrientation;
-} else {
-  Object.defineProperty(orientation, 'angle', {
-    get: () => { return (window.orientation || 0); }
-  });
-}
-
 // Quaternion to rotate from sensor coordinates to WebVR coordinates
 const SENSOR_TO_VR = new Quaternion();
 SENSOR_TO_VR.setFromAxisAngle(X_AXIS, -Math.PI / 2);
@@ -61,14 +50,11 @@ export default class PoseSensor {
 
     // Quaternions for caching transforms
     this._sensorQ = new Quaternion();
-    this._worldToScreenQ = new Quaternion();
     this._outQ = new Quaternion();
 
     this._onSensorRead = this._onSensorRead.bind(this);
     this._onSensorError = this._onSensorError.bind(this);
-    this._onOrientationChange = this._onOrientationChange.bind(this);
 
-    this._onOrientationChange();
     this.init();
   }
 
@@ -86,7 +72,14 @@ export default class PoseSensor {
     //   https://www.chromestatus.com/feature/5023919287304192
     let sensor = null;
     try {
-      sensor = new RelativeOrientationSensor({ frequency: SENSOR_FREQUENCY });
+      sensor = new RelativeOrientationSensor({
+        frequency: SENSOR_FREQUENCY,
+        // Use `referenceFrame: screen` so we don't have to manage the orientation
+        // of the device. First available in Chrome m66 (in release at time of writing),
+        // and this will fail in earlier versions, kicking off `devicemotion` fallback.
+        // @see https://w3c.github.io/accelerometer/#screen-coordinate-system
+        referenceFrame: 'screen',
+      });
       sensor.addEventListener('error', this._onSensorError);
     } catch (error) {
       this.errors.push(error);
@@ -114,8 +107,6 @@ export default class PoseSensor {
       this.sensor.addEventListener('reading', this._onSensorRead);
       this.sensor.start();
     }
-
-    window.addEventListener('orientationchange', this._onOrientationChange);
   }
 
   useDeviceMotion() {
@@ -149,7 +140,6 @@ export default class PoseSensor {
     const out = this._outQ;
     out.copy(SENSOR_TO_VR);
     out.multiply(this._sensorQ);
-    out.multiply(this._worldToScreenQ);
 
     // Handle the yaw-only case.
     if (this.config.YAW_ONLY) {
@@ -178,9 +168,4 @@ export default class PoseSensor {
   }
 
   _onSensorRead() {}
-
-  _onOrientationChange() {
-    const angle = -orientation.angle * Math.PI / 180;
-    this._worldToScreenQ.setFromAxisAngle(Z_AXIS, angle);
-  }
 }
