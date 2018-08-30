@@ -40,6 +40,6 @@
   "dependencies": {
     "gl-preserve-state": "^1.0.0",
     "nosleep.js": "^0.7.0",
-    "webvr-polyfill-dpdb": "^1.0.7"
+    "webvr-polyfill-dpdb": "^1.0.9"
   }
 }
