@@ -146,6 +146,11 @@ Dpdb.prototype.matchRule_ = function(rule, ua, screenWidth, screenHeight) {
   // (which are meant for native platforms).
   if (!rule.ua && !rule.res) return false;
 
+  // If this rule is for a Samsung device, generalize the rule name, such that
+  // it can capture all variants of Samsung line e.g. all variants of the
+  // Galaxy S8 (SM-G950A, SM-G950T, etc.) can be captured by "SM-G950".
+  if (rule.ua && rule.ua.substring(0, 2) === 'SM') rule.ua = rule.ua.substring(0, 7);
+
   // If our user agent string doesn't contain the indicated user agent string,
   // the match fails.
   if (rule.ua && ua.indexOf(rule.ua) < 0) return false;
