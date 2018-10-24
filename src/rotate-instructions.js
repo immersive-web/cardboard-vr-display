@@ -138,7 +138,7 @@ RotateInstructions.prototype.update = function() {
 };
 
 RotateInstructions.prototype.loadIcon_ = function() {
-  this.icon = Util.base64('image/svg+xml', rotateInstructionsAsset);
+  this.icon = Util.dataUri('image/svg+xml', rotateInstructionsAsset);
 };
 
 export default RotateInstructions;
