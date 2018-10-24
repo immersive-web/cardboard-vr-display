@@ -16,8 +16,8 @@
 export const MIN_TIMESTEP = 0.001;
 export const MAX_TIMESTEP = 1;
 
-export const base64 = function(mimeType, base64) {
-  return 'data:' + mimeType + ';base64,' + base64;
+export const dataUri = function(mimeType, svg) {
+  return 'data:' + mimeType + ',' + encodeURIComponent(svg);
 };
 
 export const clamp = function(value, min, max) {
