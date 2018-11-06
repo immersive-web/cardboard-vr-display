@@ -123,7 +123,7 @@ Dpdb.prototype.calcDeviceParams_ = function() {
     var matched = false;
     for (var j = 0; j < device.rules.length; j++) {
       var rule = device.rules[j];
-      if (this.matchRule_(rule, userAgent, width, height)) {
+      if (this.ruleMatches_(rule, userAgent, width, height)) {
         matched = true;
         break;
       }
@@ -141,7 +141,7 @@ Dpdb.prototype.calcDeviceParams_ = function() {
   return null;
 };
 
-Dpdb.prototype.matchRule_ = function(rule, ua, screenWidth, screenHeight) {
+Dpdb.prototype.ruleMatches_ = function(rule, ua, screenWidth, screenHeight) {
   // We can only match 'ua' and 'res' rules, not other types like 'mdmh'
   // (which are meant for native platforms).
   if (!rule.ua && !rule.res) return false;
