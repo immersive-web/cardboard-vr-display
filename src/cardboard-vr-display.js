@@ -296,6 +296,8 @@ CardboardVRDisplay.prototype.onOrientationChange_ = function(e) {
 CardboardVRDisplay.prototype.onResize_ = function(e) {
   if (this.layer_) {
     var gl = this.layer_.source.getContext('webgl');
+    if (!gl) gl = this.layer_.source.getContext('experimental-webgl');
+    if (!gl) gl = this.layer_.source.getContext('webgl2');
     // Size the CSS canvas.
     // Added padding on right and bottom because iPhone 5 will not
     // hide the URL bar unless content is bigger than the screen.
