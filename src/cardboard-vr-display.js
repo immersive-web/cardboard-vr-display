@@ -269,7 +269,13 @@ CardboardVRDisplay.prototype.submitFrame = function(pose) {
     this.distorter_.submitFrame();
   } else if (this.cardboardUI_ && this.layer_) {
     // Hack for predistorted: true.
-    var canvas = this.layer_.source.getContext('webgl').canvas;
+    var gl = this.layer_.source.getContext('webgl');
+    if (!gl)
+      gl = this.layer_.source.getContext('experimental-webgl');
+    if (!gl)
+      gl = this.layer_.source.getContext('webgl2');
+
+    var canvas = gl.canvas;
     if (canvas.width != this.lastWidth || canvas.height != this.lastHeight) {
       this.cardboardUI_.onResize();
     }
