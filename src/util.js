@@ -28,10 +28,22 @@ export const lerp = function(a, b, t) {
   return a + ((b - a) * t);
 };
 
+/**
+ * Add device check for IOS 13 !!
+ */
 export const isIOS = (function() {
-  var isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
+  var isIOS = ((/iP(hone|ad)/i).test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
   return function() {
     return isIOS;
+  };
+})();
+
+/**
+ * Check for IOS 13 Fs support
+ */
+export const supportsIOSFullscreen = (function(element) {
+  return function() {
+    return !!element.webkitRequestFullscreen;
   };
 })();
 

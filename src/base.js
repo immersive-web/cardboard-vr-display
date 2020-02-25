@@ -157,8 +157,8 @@ VRDisplay.prototype.cancelAnimationFrame = function(id) {
 };
 
 VRDisplay.prototype.wrapForFullscreen = function(element) {
-  // Don't wrap in iOS.
-  if (Util.isIOS()) {
+  // Don't wrap in iOS < 13.
+  if (Util.isIOS() && !Util.supportsIOSFullscreen(element)) {
     return element;
   }
   if (!this.fullscreenWrapper_) {
@@ -264,7 +264,8 @@ VRDisplay.prototype.removeFullscreenWrapper = function() {
   // make a best attempt at reinserting into the DOM. This occurs when swapping
   // canvases during a presentation.
   else if (this.originalParent_) {
-    this.originalParent_.appendChild(element);
+    this.originalParent_.insertBefore(element, this.originalParent_.children[1]);
+   // this.originalParent_.appendChild(element);
   }
 
   parent.removeChild(this.fullscreenWrapper_);

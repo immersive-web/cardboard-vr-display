@@ -299,9 +299,14 @@ var lerp = function lerp(a, b, t) {
   return a + (b - a) * t;
 };
 var isIOS = function () {
-  var isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
+  var isIOS = /iP(hone|ad)/i.test(navigator.platform) || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
   return function () {
     return isIOS;
+  };
+}();
+var supportsIOSFullscreen = function (element) {
+  return function () {
+    return !!element.webkitRequestFullscreen;
   };
 }();
 var isWebViewAndroid = function () {
@@ -2732,7 +2737,7 @@ VRDisplay.prototype.cancelAnimationFrame = function (id) {
   return caf(id);
 };
 VRDisplay.prototype.wrapForFullscreen = function (element) {
-  if (isIOS()) {
+  if (isIOS() && !supportsIOSFullscreen(element)) {
     return element;
   }
   if (!this.fullscreenWrapper_) {
@@ -2792,7 +2797,7 @@ VRDisplay.prototype.removeFullscreenWrapper = function () {
     parent.insertBefore(element, this.fullscreenWrapper_);
   }
   else if (this.originalParent_) {
-      this.originalParent_.appendChild(element);
+      this.originalParent_.insertBefore(element, this.originalParent_.children[1]);
     }
   parent.removeChild(this.fullscreenWrapper_);
   return element;
