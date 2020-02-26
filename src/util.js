@@ -42,7 +42,7 @@ export const isIOS = (function() {
  * Check for IOS 13 Fs support
  */
 export const supportsIOSFullscreen = (function(element) {
-  return function() {
+  return function(element) {
     return !!element.webkitRequestFullscreen;
   };
 })();

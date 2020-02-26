@@ -305,7 +305,7 @@ var isIOS = function () {
   };
 }();
 var supportsIOSFullscreen = function (element) {
-  return function () {
+  return function (element) {
     return !!element.webkitRequestFullscreen;
   };
 }();
