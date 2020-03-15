@@ -74,10 +74,10 @@ function CardboardVRDisplay(config) {
     this.rotateInstructions_ = new RotateInstructions();
   }*/
 
-  if (Util.isIOS()) {
+  //if (Util.isIOS()) {
     // Listen for resize events to workaround this awful Safari bug.
-    window.addEventListener('resize', this.onResize_.bind(this));
-  }
+  //  window.addEventListener('resize', this.onResize_.bind(this));
+ // }
 }
 CardboardVRDisplay.prototype = Object.create(VRDisplay.prototype);
 
@@ -230,6 +230,12 @@ CardboardVRDisplay.prototype.beginPresent_ = function() {
   this.vrdisplaypresentchangeHandler = this.updateBounds_.bind(this);
   window.addEventListener('vrdisplaypresentchange', this.vrdisplaypresentchangeHandler);
 
+  //if (Util.isIOS()) {
+    //this.onResizeHandler = this.onResize_.bind(this);
+    // Listen for resize events to workaround this awful Safari bug.
+    //window.addEventListener('resize', this.onResizeHandler);
+ // }
+
   // Fire this event initially, to give geometry-distortion clients the chance
   // to do something custom.
   this.fireVRDisplayDeviceParamsChange_();
@@ -252,6 +258,9 @@ CardboardVRDisplay.prototype.endPresent_ = function() {
 
   window.removeEventListener('orientationchange', this.orientationHandler);
   window.removeEventListener('vrdisplaypresentchange', this.vrdisplaypresentchangeHandler);
+  //if (Util.isIOS()) {
+    //window.removeEventListener('resize', this.onResizeHandler);
+  //}
 };
 
 /**
@@ -319,7 +328,7 @@ CardboardVRDisplay.prototype.onResize_ = function(e) {
     ];
     gl.canvas.setAttribute('style', cssProperties.join('; ') + ';');
 
-    Util.safariCssSizeWorkaround(gl.canvas);
+    //Util.safariCssSizeWorkaround(gl.canvas);
   }
 };
 

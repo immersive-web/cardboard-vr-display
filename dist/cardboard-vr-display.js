@@ -3040,9 +3040,6 @@ function CardboardVRDisplay(config$$1) {
   this.viewerSelector_ = new ViewerSelector();
   this.viewerSelector_.onChange(this.onViewerChanged_.bind(this));
   this.deviceInfo_.setViewer(this.viewerSelector_.getCurrentViewer());
-  if (isIOS()) {
-    window.addEventListener('resize', this.onResize_.bind(this));
-  }
 }
 CardboardVRDisplay.prototype = Object.create(VRDisplay.prototype);
 CardboardVRDisplay.prototype._getPose = function () {
@@ -3185,7 +3182,6 @@ CardboardVRDisplay.prototype.onResize_ = function (e) {
     'width: 100vw', 'height: 100vh', 'border: 0', 'margin: 0',
     'padding: 0px', 'box-sizing: content-box'];
     gl.canvas.setAttribute('style', cssProperties.join('; ') + ';');
-    safariCssSizeWorkaround(gl.canvas);
   }
 };
 CardboardVRDisplay.prototype.onViewerChanged_ = function (viewer) {
