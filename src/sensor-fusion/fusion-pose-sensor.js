@@ -215,21 +215,24 @@ FusionPoseSensor.prototype.updateDeviceMotion_ = function(deviceMotion) {
   }
 
   this.accelerometer.set(-accGravity.x, -accGravity.y, -accGravity.z);
-  if (Util.isR7()) {
-    this.gyroscope.set(-rotRate.beta, rotRate.alpha, rotRate.gamma);
-  } else {
-    this.gyroscope.set(rotRate.alpha, rotRate.beta, rotRate.gamma);
-  }
+  if (rotRate) {
+    if (Util.isR7()) {
+      this.gyroscope.set(-rotRate.beta, rotRate.alpha, rotRate.gamma);
+    } else {
+      this.gyroscope.set(rotRate.alpha, rotRate.beta, rotRate.gamma);
+    }
 
-  // DeviceMotionEvents should report `rotationRate` in degrees, so we need
-  // to convert to radians. However, some browsers (Android Chrome < m66) report
-  // the rotation as radians, in which case no conversion is needed.
-  if (!this.isDeviceMotionInRadians) {
-    this.gyroscope.multiplyScalar(Math.PI / 180);
+    // DeviceMotionEvents should report `rotationRate` in degrees, so we need
+    // to convert to radians. However, some browsers (Android Chrome < m66) report
+    // the rotation as radians, in which case no conversion is needed.
+    if (!this.isDeviceMotionInRadians) {
+      this.gyroscope.multiplyScalar(Math.PI / 180);
+    }
+
+    this.filter.addGyroMeasurement(this.gyroscope, timestampS);
   }
 
   this.filter.addAccelMeasurement(this.accelerometer, timestampS);
-  this.filter.addGyroMeasurement(this.gyroscope, timestampS);
 
   this.previousTimestampS = timestampS;
 };
