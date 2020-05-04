@@ -72,6 +72,17 @@ export const getChromeVersion = (function() {
 })();
 
 /**
+ * In Safari 13.4 for iOS `devicemotion` events are broken
+ */
+export const isSafariWithoutDeviceMotion = (function() {
+  let value = false;
+  value = isIOS() && isSafari() && navigator.userAgent.indexOf('13_4') !== -1;
+  return function () {
+    return value;
+  };
+})();
+
+/**
  * In Chrome m65, `devicemotion` events are broken but subsequently fixed
  * in 65.0.3325.148. Since many browsers use Chromium, ensure that
  * we scope this detection by branch and build numbers to provide

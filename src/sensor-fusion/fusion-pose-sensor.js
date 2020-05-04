@@ -41,10 +41,10 @@ function FusionPoseSensor(kFilter, predictionTime, yawOnly, isDebug) {
   // https://github.com/immersive-web/cardboard-vr-display/issues/18
   let chromeVersion = Util.getChromeVersion();
   this.isDeviceMotionInRadians = !this.isIOS && chromeVersion && chromeVersion < 66;
-  // In Chrome m65 there's a regression of devicemotion events. Fallback
+  // In Chrome m65 and Safari 13.4 there's a regression of devicemotion events. Fallback
   // to using deviceorientation for these specific builds. More information
   // at `Util.isChromeWithoutDeviceMotion`.
-  this.isWithoutDeviceMotion = Util.isChromeWithoutDeviceMotion();
+  this.isWithoutDeviceMotion = Util.isChromeWithoutDeviceMotion() || Util.isSafariWithoutDeviceMotion();
 
   this.filterToWorldQ = new MathUtil.Quaternion();
 
