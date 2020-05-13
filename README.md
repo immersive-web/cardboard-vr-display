@@ -185,6 +185,12 @@ frame.pose; // { orientation, position }
 * `npm run build`: builds the distributable.
 * `npm run watch`: watches `src/` for changes and rebuilds on change.
 
+### Releasing a new version
+
+For maintainers only, to cut a new release for npm, use the [npm version] command. The `preversion`, `version` and `postversion` npm scripts will run tests, build, add built files and tag to git, push to github, and publish the new npm version.
+
+`npm version <semverstring>`
+
 ## Running The Demo
 
 View the [example] to see a demo running the CardboardVRDisplay. This executes
