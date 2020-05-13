@@ -27,6 +27,7 @@
   ],
   "license": "Apache-2.0",
   "scripts": {
+    "test": "echo \"No tests defined\"",
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "preversion": "npm test",
