@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "gl-preserve-state": "^1.0.0",
-    "nosleep.js": "github:Domratchev/NoSleep.js#master",
+    "nosleep.js": "github:richtr/NoSleep.js#master",
     "webvr-polyfill-dpdb": "^1.0.17"
   }
 }
