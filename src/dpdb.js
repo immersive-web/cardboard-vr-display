@@ -35,7 +35,7 @@ function Dpdb(url, onDeviceParamsUpdated) {
   this.recalculateDeviceParams_();
 
   // XHR to fetch online DPDB file, if requested.
-  if (url) {
+  /*if (url) {
     // Set the callback.
     this.onDeviceParamsUpdated = onDeviceParamsUpdated;
 
@@ -54,7 +54,7 @@ function Dpdb(url, onDeviceParamsUpdated) {
       }
     });
     xhr.send();
-  }
+  }*/
 }
 
 // Returns the current device parameters.
@@ -81,7 +81,7 @@ Dpdb.prototype.recalculateDeviceParams_ = function() {
 // known devices.
 Dpdb.prototype.calcDeviceParams_ = function() {
   var db = this.dpdb; // shorthand
-  if (!db) {
+  /*if (!db) {
     console.error('DPDB not available.');
     return null;
   }
@@ -92,29 +92,29 @@ Dpdb.prototype.calcDeviceParams_ = function() {
   if (!db.devices || !db.devices.length) {
     console.error('DPDB does not have a devices section.');
     return null;
-  }
+  }*/
 
   // Get the actual user agent and screen dimensions in pixels.
   var userAgent = navigator.userAgent || navigator.vendor || window.opera;
   var width = Util.getScreenWidth();
   var height = Util.getScreenHeight();
-
+/*
   if (!db.devices) {
     console.error('DPDB has no devices section.');
     return null;
-  }
+  }*/
 
   for (var i = 0; i < db.devices.length; i++) {
     var device = db.devices[i];
-    if (!device.rules) {
+    /*if (!device.rules) {
       console.warn('Device[' + i + '] has no rules section.');
       continue;
-    }
+    }*/
 
-    if (device.type != 'ios' && device.type != 'android') {
+    /*if (device.type != 'ios' && device.type != 'android') {
       console.warn('Device[' + i + '] has invalid type.');
       continue;
-    }
+    }*/
 
     // See if this device is of the appropriate type.
     if (Util.isIOS() != (device.type == 'ios')) continue;
@@ -123,7 +123,7 @@ Dpdb.prototype.calcDeviceParams_ = function() {
     var matched = false;
     for (var j = 0; j < device.rules.length; j++) {
       var rule = device.rules[j];
-      if (this.ruleMatches_(rule, userAgent, width, height)) {
+      if (this.matchRule_(rule, userAgent, width, height)) {
         matched = true;
         break;
       }
@@ -141,15 +141,10 @@ Dpdb.prototype.calcDeviceParams_ = function() {
   return null;
 };
 
-Dpdb.prototype.ruleMatches_ = function(rule, ua, screenWidth, screenHeight) {
+Dpdb.prototype.matchRule_ = function(rule, ua, screenWidth, screenHeight) {
   // We can only match 'ua' and 'res' rules, not other types like 'mdmh'
   // (which are meant for native platforms).
   if (!rule.ua && !rule.res) return false;
-
-  // If this rule is for a Samsung device, generalize the rule name, such that
-  // it can capture all variants of Samsung line e.g. all variants of the
-  // Galaxy S8 (SM-G950A, SM-G950T, etc.) can be captured by "SM-G950".
-  if (rule.ua && rule.ua.substring(0, 2) === 'SM') rule.ua = rule.ua.substring(0, 7);
 
   // If our user agent string doesn't contain the indicated user agent string,
   // the match fails.

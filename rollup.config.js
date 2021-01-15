@@ -34,8 +34,19 @@ export default {
   plugins: [
     json(),
     babel({
-      plugins: ['external-helpers'],
+      //plugins: ['external-helpers'],
       exclude: 'node_modules/**',
+      "presets": [
+                                [
+                                  "@babel/preset-env",
+                                  {
+                                    modules: false,
+                                    "targets": {
+                                        "browsers": ["last 2 versions"]
+                                    }
+                                  }
+                                ]
+                              ]
     }),
     resolve(),
     commonjs(),

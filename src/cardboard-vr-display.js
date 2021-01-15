@@ -18,7 +18,7 @@ import CardboardUI from './cardboard-ui.js';
 import DeviceInfo from './device-info.js';
 import Dpdb from './dpdb.js';
 import PoseSensor from './pose-sensor.js';
-import RotateInstructions from './rotate-instructions.js';
+//import RotateInstructions from './rotate-instructions.js';
 import ViewerSelector from './viewer-selector.js';
 import { VRFrameData, VRDisplay, VRDisplayCapabilities } from './base.js';
 import * as Util from './util.js';
@@ -61,23 +61,23 @@ function CardboardVRDisplay(config) {
   this.cardboardUI_ = null;
 
   this.dpdb_ = new Dpdb(this.config.DPDB_URL, this.onDeviceParamsUpdated_.bind(this));
-  this.deviceInfo_ = new DeviceInfo(this.dpdb_.getDeviceParams(),
-                                    config.ADDITIONAL_VIEWERS);
+  this.deviceInfo_ = new DeviceInfo(this.dpdb_.getDeviceParams());
 
-  this.viewerSelector_ = new ViewerSelector(config.DEFAULT_VIEWER);
+  this.viewerSelector_ = new ViewerSelector();
   this.viewerSelector_.onChange(this.onViewerChanged_.bind(this));
 
   // Set the correct initial viewer.
   this.deviceInfo_.setViewer(this.viewerSelector_.getCurrentViewer());
 
+/*
   if (!this.config.ROTATE_INSTRUCTIONS_DISABLED) {
     this.rotateInstructions_ = new RotateInstructions();
-  }
+  }*/
 
-  if (Util.isIOS()) {
+  //if (Util.isIOS()) {
     // Listen for resize events to workaround this awful Safari bug.
-    window.addEventListener('resize', this.onResize_.bind(this));
-  }
+  //  window.addEventListener('resize', this.onResize_.bind(this));
+ // }
 }
 CardboardVRDisplay.prototype = Object.create(VRDisplay.prototype);
 
@@ -141,14 +141,14 @@ CardboardVRDisplay.prototype.getEyeParameters = function(whichEye) {
     renderHeight: this.deviceInfo_.device.height * this.bufferScale_,
   };
 
-  Object.defineProperty(eyeParams, 'fieldOfView', {
+  /*Object.defineProperty(eyeParams, 'fieldOfView', {
     enumerable: true,
     get: function() {
       Util.deprecateWarning('VRFieldOfView',
                             'VRFrameData\'s projection matrices');
       return fieldOfView;
     },
-  });
+  });*/
 
   return eyeParams;
 };
@@ -212,7 +212,7 @@ CardboardVRDisplay.prototype.beginPresent_ = function() {
     }.bind(this));
   }
 
-  if (this.rotateInstructions_) {
+ /* if (this.rotateInstructions_) {
     if (Util.isLandscapeMode() && Util.isMobile()) {
       // In landscape mode, temporarily show the "put into Cardboard"
       // interstitial. Otherwise, do the default thing.
@@ -221,7 +221,7 @@ CardboardVRDisplay.prototype.beginPresent_ = function() {
       this.rotateInstructions_.update();
     }
   }
-
+*/
   // Listen for orientation change events in order to show interstitial.
   this.orientationHandler = this.onOrientationChange_.bind(this);
   window.addEventListener('orientationchange', this.orientationHandler);
@@ -229,6 +229,12 @@ CardboardVRDisplay.prototype.beginPresent_ = function() {
   // Listen for present display change events in order to update distorter dimensions
   this.vrdisplaypresentchangeHandler = this.updateBounds_.bind(this);
   window.addEventListener('vrdisplaypresentchange', this.vrdisplaypresentchangeHandler);
+
+  //if (Util.isIOS()) {
+    //this.onResizeHandler = this.onResize_.bind(this);
+    // Listen for resize events to workaround this awful Safari bug.
+    //window.addEventListener('resize', this.onResizeHandler);
+ // }
 
   // Fire this event initially, to give geometry-distortion clients the chance
   // to do something custom.
@@ -244,14 +250,17 @@ CardboardVRDisplay.prototype.endPresent_ = function() {
     this.cardboardUI_.destroy();
     this.cardboardUI_ = null;
   }
-
+/*
   if (this.rotateInstructions_) {
     this.rotateInstructions_.hide();
-  }
+  }*/
   this.viewerSelector_.hide();
 
   window.removeEventListener('orientationchange', this.orientationHandler);
   window.removeEventListener('vrdisplaypresentchange', this.vrdisplaypresentchangeHandler);
+  //if (Util.isIOS()) {
+    //window.removeEventListener('resize', this.onResizeHandler);
+  //}
 };
 
 /**
@@ -269,13 +278,7 @@ CardboardVRDisplay.prototype.submitFrame = function(pose) {
     this.distorter_.submitFrame();
   } else if (this.cardboardUI_ && this.layer_) {
     // Hack for predistorted: true.
-    var gl = this.layer_.source.getContext('webgl');
-    if (!gl)
-      gl = this.layer_.source.getContext('experimental-webgl');
-    if (!gl)
-      gl = this.layer_.source.getContext('webgl2');
-
-    var canvas = gl.canvas;
+    var canvas = this.layer_.source.getContext('webgl').canvas;
     if (canvas.width != this.lastWidth || canvas.height != this.lastHeight) {
       this.cardboardUI_.onResize();
     }
@@ -292,9 +295,9 @@ CardboardVRDisplay.prototype.onOrientationChange_ = function(e) {
   this.viewerSelector_.hide();
 
   // Update the rotate instructions.
-  if (this.rotateInstructions_) {
+  /*if (this.rotateInstructions_) {
     this.rotateInstructions_.update();
-  }
+  }*/
 
   this.onResize_();
 };
@@ -302,8 +305,6 @@ CardboardVRDisplay.prototype.onOrientationChange_ = function(e) {
 CardboardVRDisplay.prototype.onResize_ = function(e) {
   if (this.layer_) {
     var gl = this.layer_.source.getContext('webgl');
-    if (!gl) gl = this.layer_.source.getContext('experimental-webgl');
-    if (!gl) gl = this.layer_.source.getContext('webgl2');
     // Size the CSS canvas.
     // Added padding on right and bottom because iPhone 5 will not
     // hide the URL bar unless content is bigger than the screen.
@@ -327,7 +328,7 @@ CardboardVRDisplay.prototype.onResize_ = function(e) {
     ];
     gl.canvas.setAttribute('style', cssProperties.join('; ') + ';');
 
-    Util.safariCssSizeWorkaround(gl.canvas);
+    //Util.safariCssSizeWorkaround(gl.canvas);
   }
 };
 

@@ -56,10 +56,10 @@ function CardboardDistorter(gl, cardboardUI, bufferScale, dirtySubmitFrameBindin
   this.bufferScale = bufferScale;
   this.dirtySubmitFrameBindings = dirtySubmitFrameBindings;
   this.ctxAttribs = gl.getContextAttributes();
-  this.instanceExt = gl.getExtension('ANGLE_instanced_arrays');
 
   this.meshWidth = 20;
   this.meshHeight = 20;
+
 
   this.bufferWidth = gl.drawingBufferWidth;
   this.bufferHeight = gl.drawingBufferHeight;
@@ -422,13 +422,6 @@ CardboardDistorter.prototype.submitFrame = function() {
     // Bind the real default framebuffer
     self.realBindFramebuffer.call(gl, gl.FRAMEBUFFER, null);
 
-    var positionDivisor = 0;
-    var texCoordDivisor = 0;
-    if (self.instanceExt) {
-      positionDivisor = gl.getVertexAttrib(self.attribs.position, self.instanceExt.VERTEX_ATTRIB_ARRAY_DIVISOR_ANGLE);
-      texCoordDivisor = gl.getVertexAttrib(self.attribs.texCoord, self.instanceExt.VERTEX_ATTRIB_ARRAY_DIVISOR_ANGLE);
-    }
-
     // Make sure the GL state is in a good place
     if (self.cullFace) { self.realDisable.call(gl, gl.CULL_FACE); }
     if (self.depthTest) { self.realDisable.call(gl, gl.DEPTH_TEST); }
@@ -455,14 +448,6 @@ CardboardDistorter.prototype.submitFrame = function() {
     gl.enableVertexAttribArray(self.attribs.texCoord);
     gl.vertexAttribPointer(self.attribs.position, 2, gl.FLOAT, false, 20, 0);
     gl.vertexAttribPointer(self.attribs.texCoord, 3, gl.FLOAT, false, 20, 8);
-    if (self.instanceExt) {
-      if (positionDivisor != 0) {
-        self.instanceExt.vertexAttribDivisorANGLE(self.attribs.position, 0);
-      }
-      if (texCoordDivisor != 0) {
-        self.instanceExt.vertexAttribDivisorANGLE(self.attribs.texCoord, 0);
-      }
-    }
 
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(self.uniforms.diffuse, 0);
@@ -501,15 +486,6 @@ CardboardDistorter.prototype.submitFrame = function() {
     self.realViewport.apply(gl, self.viewport);
     if (self.ctxAttribs.alpha || !self.ctxAttribs.preserveDrawingBuffer) {
       self.realClearColor.apply(gl, self.clearColor);
-    }
-
-    if (self.instanceExt) {
-      if (positionDivisor != 0) {
-        self.instanceExt.vertexAttribDivisorANGLE(self.attribs.position, positionDivisor);
-      }
-      if (texCoordDivisor != 0) {
-        self.instanceExt.vertexAttribDivisorANGLE(self.attribs.texCoord, texCoordDivisor);
-      }
     }
   });
 

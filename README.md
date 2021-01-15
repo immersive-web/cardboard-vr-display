@@ -54,7 +54,6 @@ to fall back to `devicemotion`. Using Feature Policies now will guarantee a more
 * Chrome M63 supports Sensors, although not the corresponding Feature Policy [until Chrome M65][sensors-main-frame].
   This results in Chrome M63/M64 only supporting Sensors in main frames, and these browsers
   will fall back to using devicemotion if in iframes.
-* Using Sensors in a cross-origin iframe [requires the frame to be in focus](https://www.w3.org/TR/generic-sensor/#focused-area). In builds of Chrome prior to M69, this logic is [erroneously reversed](https://bugs.chromium.org/p/chromium/issues/detail?id=849501). If loading content via cross-origin iframe, you can disable Sensors, triggering the `devicemotion` fallback with this [hacky workaround](https://github.com/immersive-web/cardboard-vr-display/blob/c196e15a8c7ccf594fe6a5044fbdcb51cc2eff91/examples/index.html#L117-L124). More info in [#27](https://github.com/immersive-web/cardboard-vr-display/issues/27).
 
 ### Magic Window
 
@@ -89,35 +88,6 @@ import CardboardVRDisplay from 'cardboard-vr-display';
 
 // Default options
 const options = {
-  // Optionally inject custom Viewer parameters as an option. Each item
-  // in the array must be an object with the following properties; here is
-  // an example of the built in CardboardV2 viewer:
-  //
-  // {
-  //   id: 'CardboardV2',
-  //   label: 'Cardboard I/O 2015',
-  //   fov: 60,
-  //   interLensDistance: 0.064,
-  //   baselineLensDistance: 0.035,
-  //   screenLensDistance: 0.039,
-  //   distortionCoefficients: [0.34, 0.55],
-  //   inverseCoefficients: [-0.33836704, -0.18162185, 0.862655, -1.2462051,
-  //     1.0560602, -0.58208317, 0.21609078, -0.05444823, 0.009177956,
-  //     -9.904169E-4, 6.183535E-5, -1.6981803E-6]
-  // }
-  // Added in 1.0.12.
-  ADDITIONAL_VIEWERS: [],
-
-  // Select the viewer by ID. If unspecified, defaults to 'CardboardV1'.
-  // Added in 1.0.12.
-  DEFAULT_VIEWER: '',
-
-  // By default, on mobile, a wakelock is necessary to prevent the device's screen
-  // from turning off without user input. Disable if you're keeping the screen awake through
-  // other means on mobile. A wakelock is never used on desktop.
-  // Added in 1.0.3.
-  MOBILE_WAKE_LOCK: true,
-
   // Whether or not CardboardVRDisplay is in debug mode. Logs extra
   // messages. Added in 1.0.2.
   DEBUG: false,
@@ -133,6 +103,9 @@ const options = {
 
   // How far into the future to predict during fast motion (in seconds).
   PREDICTION_TIME_S: 0.040,
+
+  // Flag to enable touch panner. In case you have your own touch controls.
+  TOUCH_PANNER_DISABLED: true,
 
   // Flag to disabled the UI in VR Mode.
   CARDBOARD_UI_DISABLED: false,
@@ -184,12 +157,6 @@ frame.pose; // { orientation, position }
 * `npm install`: installs the dependencies.
 * `npm run build`: builds the distributable.
 * `npm run watch`: watches `src/` for changes and rebuilds on change.
-
-### Releasing a new version
-
-For maintainers only, to cut a new release for npm, use the [npm version] command. The `preversion`, `version` and `postversion` npm scripts will run tests, build, add built files and tag to git, push to github, and publish the new npm version.
-
-`npm version <semverstring>`
 
 ## Running The Demo
 
